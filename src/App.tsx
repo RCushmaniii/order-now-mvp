@@ -2,8 +2,27 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { AppErrorBoundary } from './components/ErrorBoundary'
 
-function App() {
+// Test component that will trigger error boundary
+function TestErrorBoundary() {
+  const [shouldError, setShouldError] = useState(false);
+
+  if (shouldError) {
+    throw new Error("This error will be caught by the error boundary!");
+  }
+
+  return (
+    <button
+      onClick={() => setShouldError(true)}
+      className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+    >
+      Test Error Boundary (Will show fallback UI)
+    </button>
+  );
+}
+
+function AppContent() {
   const [count, setCount] = useState(0)
 
   return (
@@ -19,7 +38,6 @@ function App() {
               <img src={reactLogo} className="logo react w-16 h-16" alt="React logo" />
             </a>
           </div>
-
           <div className="bg-white rounded-lg shadow-lg p-6 inline-block">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">
               Vite + React + Tailwind ✅
@@ -47,6 +65,27 @@ function App() {
               >
                 Reset
               </button>
+            </div>
+
+            {/* Error Boundary Test Section */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-700 mb-3">Error Boundary Tests</h3>
+              <div className="space-y-2">
+                <TestErrorBoundary />
+                <button
+                  onClick={() => {
+                    try {
+                      throw new Error("Event handler error - won't be caught by error boundary");
+                    } catch (error) {
+                      console.error("Event handler error caught:", error);
+                      alert("Event handler error caught! Check console.");
+                    }
+                  }}
+                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                >
+                  Test Event Handler Error (Won't crash app)
+                </button>
+              </div>
             </div>
           </div>
 
@@ -109,6 +148,14 @@ function App() {
         </div>
       </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <AppErrorBoundary>
+      <AppContent />
+    </AppErrorBoundary>
   )
 }
 
