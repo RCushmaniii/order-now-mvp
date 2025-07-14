@@ -9,7 +9,10 @@ export function useAsyncError() {
     return throwError;
 }
 
-// Usage in components with async operations
+// Usage example in components with async operations:
+/*
+In your React component (TSX file):
+
 function MyComponent() {
     const throwError = useAsyncError();
 
@@ -23,5 +26,6 @@ function MyComponent() {
         }
     };
 
-    return <button onClick={ handleAsyncOperation }> Do async thing </button>;
+    return <button onClick={handleAsyncOperation}>Do async thing</button>;
 }
+*/

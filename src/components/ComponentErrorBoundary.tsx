@@ -7,7 +7,7 @@ interface ComponentErrorBoundaryProps {
     componentName?: string;
 }
 
-function SimpleErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+function SimpleErrorFallback({ resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
     return (
         <div style={{
             padding: '10px',
@@ -29,7 +29,7 @@ export function ComponentErrorBoundary({
     return (
         <ErrorBoundary
             FallbackComponent={Fallback}
-            onError={(error, info) => {
+            onError={(error) => {
                 console.error(`${componentName} error:`, error);
 
                 // Log component-specific errors

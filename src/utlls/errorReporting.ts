@@ -5,6 +5,10 @@ interface ErrorInfo {
 }
 
 export function reportError(error: Error, errorInfo: ErrorInfo) {
+    // Temporarily log parameters to avoid unused variable warnings
+    console.debug('Error reporting disabled in development:', { error: error.message, errorInfo });
+    
+    // Production error reporting will be enabled below
     if (process.env.NODE_ENV === 'production') {
         // Sentry example
         // Sentry.captureException(error, {
