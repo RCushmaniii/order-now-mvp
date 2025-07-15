@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Store, Book, Utensils, Briefcase, Star, ArrowRight } from 'lucide-react';
 
 interface StoreData {
@@ -15,6 +16,7 @@ interface StoreData {
 }
 
 const StoreDirectory = () => {
+    const navigate = useNavigate();
     const stores: StoreData[] = [
         {
             id: 'dra-veronica-rosas',
@@ -55,8 +57,8 @@ const StoreDirectory = () => {
     ];
 
     const handleStoreClick = (storeId: string) => {
-        // In a real app, this would use React Router
-        window.location.href = `/order/${storeId}`;
+        // Use React Router navigation instead of window.location
+        navigate(`/order/${storeId}`);
     };
 
     return (
