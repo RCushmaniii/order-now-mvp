@@ -5,6 +5,8 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { AppErrorBoundary } from './components/ErrorBoundary'
 import OrderPage from './pages/OrderPage'
+import StoreDirectory from './pages/StoreDirectory'
+import MarketingPage from './pages/MarketingPage';
 
 // Test component that will trigger error boundary
 function TestErrorBoundary() {
@@ -42,10 +44,28 @@ function HomePage() {
                   Home
                 </Link>
                 <Link
-                  to="/order"
+                  to="/marketing"
+                  className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                >
+                  Marketing
+                </Link>
+                <Link
+                  to="/stores"
+                  className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                >
+                  Store Directory
+                </Link>
+                <Link
+                  to="/order/dra-veronica-rosas"
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Dr. Verónica
+                </Link>
+                <Link
+                  to="/order/bella-italia"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
-                  Order Now
+                  Order Food
                 </Link>
               </div>
             </div>
@@ -64,58 +84,109 @@ function HomePage() {
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6 inline-block">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              Restaurant Ordering Platform
+              YapaNow - Multi-Channel Ordering Platform
             </h1>
-            <p className="text-gray-600">Vite + React + Tailwind + Supabase ✅</p>
+            <p className="text-gray-600">Restaurants • Academic Services • Professional Consultations</p>
+            <p className="text-sm text-gray-500 mt-2">Vite + React + Tailwind + Supabase ✅</p>
           </div>
         </div>
 
         {/* Quick Demo Section */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-8">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-8">
+          {/* Dr. Verónica Demo */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">🍕 Order Demo</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">🦎 Academic Services</h2>
             <p className="text-gray-600 mb-6">
-              Click below to see the customer ordering experience that integrates with your Supabase database.
+              Experience Dr. Verónica's professional biology consulting platform with Facebook integration.
             </p>
             <button
-              onClick={() => navigate('/order?store=tonys-pizza')}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors transform hover:scale-105 active:scale-95 w-full"
+              onClick={() => navigate('/order/dra-veronica-rosas')}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors transform hover:scale-105 active:scale-95 w-full mb-4"
             >
-              🚀 Try Live Demo
+              🚀 Solicitar Servicios
             </button>
-            <div className="mt-4 text-sm text-gray-500">
-              <p>✅ Facebook "Order Now" button simulation</p>
-              <p>✅ Real-time cart updates</p>
-              <p>✅ Database integration ready</p>
+            <div className="text-sm text-gray-500">
+              <p>✅ Spanish interface</p>
+              <p>✅ Academic service catalog</p>
+              <p>✅ Facebook deep link ready</p>
+              <p>✅ Mexican peso pricing</p>
             </div>
           </div>
 
+          {/* Restaurant Demo */}
+          <div className="bg-white rounded-xl shadow-lg p-8">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">🍕 Restaurant Orders</h2>
+            <p className="text-gray-600 mb-6">
+              Traditional restaurant ordering experience with real-time cart updates.
+            </p>
+            <button
+              onClick={() => navigate('/order/bella-italia')}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors transform hover:scale-105 active:scale-95 w-full mb-4"
+            >
+              🚀 Order Food Now
+            </button>
+            <div className="text-sm text-gray-500">
+              <p>✅ Multi-restaurant support</p>
+              <p>✅ Real-time cart updates</p>
+              <p>✅ Payment integration ready</p>
+              <p>✅ Database connected</p>
+            </div>
+          </div>
+
+          {/* Store Directory */}
+          <div className="bg-white rounded-xl shadow-lg p-8">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">🏪 Store Directory</h2>
+            <p className="text-gray-600 mb-6">
+              Browse all available businesses and services in one central location.
+            </p>
+            <button
+              onClick={() => navigate('/stores')}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors transform hover:scale-105 active:scale-95 w-full mb-4"
+            >
+              🚀 Browse All Stores
+            </button>
+            <div className="text-sm text-gray-500">
+              <p>✅ Multi-business platform</p>
+              <p>✅ Service categorization</p>
+              <p>✅ Professional showcase</p>
+              <p>✅ Easy navigation</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Platform Features */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-8">
           <div className="bg-white rounded-xl shadow-lg p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">📊 Platform Features</h2>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span className="text-gray-700">Multi-tenant restaurant support</span>
+                <span className="text-gray-700">Multi-business support (restaurants, services, consulting)</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-gray-700">Direct Stripe payments to restaurants</span>
+                <span className="text-gray-700">Facebook deep link integration</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                <span className="text-gray-700">Facebook/WhatsApp integration</span>
+                <span className="text-gray-700">WhatsApp messaging ready</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                 <span className="text-gray-700">Real-time order management</span>
               </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span className="text-gray-700">Multi-language support (EN/ES)</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <span className="text-gray-700">Professional service catalogs</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Development Tools Section */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Counter Card - for development testing */}
+          {/* Development Tools Section */}
           <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">🛠️ Dev Tools</h2>
             <div className="text-center">
@@ -135,7 +206,6 @@ function HomePage() {
                 </button>
               </div>
             </div>
-
             {/* Error Boundary Test Section */}
             <div className="mt-6 pt-6 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-gray-700 mb-3">Error Boundary Tests</h3>
@@ -144,26 +214,61 @@ function HomePage() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Next Steps */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">🎯 Next Steps</h2>
+        {/* Facebook Integration Demo */}
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto mb-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">📱 Facebook Integration Test</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <h3 className="font-semibold text-blue-800 mb-2">Dr. Verónica's Facebook Button</h3>
+              <p className="text-sm text-blue-600 mb-3">Simulates clicking "Solicitar Servicios" from Facebook</p>
+              <div className="bg-white p-3 rounded border border-blue-200">
+                <code className="text-xs text-gray-600">
+                  https://yapanow.netlify.app/order/dra-veronica-rosas
+                </code>
+              </div>
+            </div>
+            <div className="p-4 bg-green-50 rounded-lg">
+              <h3 className="font-semibold text-green-800 mb-2">Restaurant Facebook Button</h3>
+              <p className="text-sm text-green-600 mb-3">Simulates clicking "Order Now" from Facebook</p>
+              <div className="bg-white p-3 rounded border border-green-200">
+                <code className="text-xs text-gray-600">
+                  https://yapanow.netlify.app/order/bella-italia
+                </code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Next Steps */}
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">🎯 Implementation Status</h2>
+          <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <h4 className="font-semibold text-blue-800">1. Connect Supabase</h4>
-                <p className="text-sm text-blue-600">Replace mock data with real database</p>
+              <div className="p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+                <h4 className="font-semibold text-green-800">✅ Completed</h4>
+                <ul className="text-sm text-green-600 mt-2 space-y-1">
+                  <li>• Multi-business platform architecture</li>
+                  <li>• Dr. Verónica's academic services</li>
+                  <li>• Facebook deep link integration</li>
+                  <li>• Store directory system</li>
+                  <li>• Spanish/English interfaces</li>
+                  <li>• Local image management</li>
+                </ul>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <h4 className="font-semibold text-green-800">2. Add Stripe Payments</h4>
-                <p className="text-sm text-green-600">Direct payments to restaurant accounts</p>
-              </div>
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <h4 className="font-semibold text-purple-800">3. Store Owner Dashboard</h4>
-                <p className="text-sm text-purple-600">Real-time order management</p>
-              </div>
-              <div className="p-3 bg-orange-50 rounded-lg">
-                <h4 className="font-semibold text-orange-800">4. Facebook Integration</h4>
-                <p className="text-sm text-orange-600">Deep links and messaging</p>
+            </div>
+            <div className="space-y-4">
+              <div className="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                <h4 className="font-semibold text-blue-800">🚧 Next Steps</h4>
+                <ul className="text-sm text-blue-600 mt-2 space-y-1">
+                  <li>• Connect real Supabase data</li>
+                  <li>• Add payment processing</li>
+                  <li>• Build store owner dashboard</li>
+                  <li>• Implement WhatsApp notifications</li>
+                  <li>• Add real image uploads</li>
+                  <li>• Production deployment optimization</li>
+                </ul>
               </div>
             </div>
           </div>
@@ -171,7 +276,7 @@ function HomePage() {
 
         {/* Footer */}
         <div className="text-center mt-12">
-          <div className="flex justify-center space-x-4">
+          <div className="flex justify-center space-x-4 flex-wrap">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
               Vite + React
             </span>
@@ -182,7 +287,10 @@ function HomePage() {
               Tailwind CSS
             </span>
             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-              Stripe
+              Multi-Language
+            </span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+              Facebook Ready
             </span>
           </div>
         </div>
@@ -197,6 +305,10 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/marketing" element={<MarketingPage />} />
+          <Route path="/stores" element={<StoreDirectory />} />
+          <Route path="/order/:storeId" element={<OrderPage />} />
+          {/* Legacy route for backward compatibility */}
           <Route path="/order" element={<OrderPage />} />
         </Routes>
       </Router>
