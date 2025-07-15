@@ -57,76 +57,217 @@ const OrderPage: React.FC = () => {
         special_instructions: ''
     });
 
+    // Check if this is Dr. Verónica's academic services
+    const isAcademicServices = storeId === 'dra-veronica-rosas';
+
+    // Dynamic text based on service type
+    const getServiceText = (key: string) => {
+        if (isAcademicServices) {
+            const academicTexts: { [key: string]: string } = {
+                'cart': 'Servicios Solicitados',
+                'addToCart': 'Solicitar Servicio',
+                'placeOrder': 'Enviar Solicitud',
+                'orderPlaced': '¡Solicitud Enviada!',
+                'orderComplete': 'Gracias por su solicitud. Nos pondremos en contacto pronto.',
+                'deliveryAddress': 'Información de Contacto',
+                'specialInstructions': 'Detalles Adicionales',
+                'specialPlaceholder': '¿Algún detalle específico sobre el servicio requerido?',
+                'total': 'Total Estimado:',
+                'loading': 'Enviando solicitud...',
+                'cartEmpty': 'No hay servicios seleccionados',
+                'min': 'días hábiles',
+                'payment': 'Forma de Pago Preferida',
+                'loadingMenu': 'Cargando servicios...',
+                'unavailable': 'No Disponible'
+            };
+            return academicTexts[key] || key;
+        }
+
+        const restaurantTexts: { [key: string]: string } = {
+            'cart': 'Your Order',
+            'addToCart': 'Add to Cart',
+            'placeOrder': 'Place Order',
+            'orderPlaced': 'Order Placed Successfully!',
+            'orderComplete': 'Thank you for your order. We\'ll notify you when it\'s ready.',
+            'deliveryAddress': 'Delivery Address',
+            'specialInstructions': 'Special Instructions',
+            'specialPlaceholder': 'Any special requests?',
+            'total': 'Total:',
+            'loading': 'Placing Order...',
+            'cartEmpty': 'Your cart is empty',
+            'min': 'min',
+            'payment': 'Payment Method',
+            'loadingMenu': 'Loading menu...',
+            'unavailable': 'Unavailable'
+        };
+        return restaurantTexts[key] || key;
+    };
+
+    // Format price based on service type
+    const formatPrice = (price: number) => {
+        if (isAcademicServices) {
+            return `$${price.toLocaleString('es-MX')} MXN`;
+        }
+        return `$${price.toFixed(2)}`;
+    };
+
     // Mock data for demonstration
     useEffect(() => {
-        const mockStore: Store = {
-            id: storeId || '1',
-            name: 'Bella Italia',
-            description: 'Authentic Italian cuisine made with love',
-            logo_url: 'https://via.placeholder.com/100x100?text=BI',
-            phone: '+1 (555) 123-4567',
-            address: '123 Main St, City, State 12345',
-            hours: 'Mon-Sun: 11:00 AM - 10:00 PM',
-            rating: 4.5
-        };
+        let mockStore: Store;
+        let mockMenuItems: MenuItem[];
 
-        const mockMenuItems: MenuItem[] = [
-            {
-                id: '1',
-                name: 'Margherita Pizza',
-                description: 'Fresh tomatoes, mozzarella, basil',
-                price: 14.99,
-                category: 'Pizza',
-                image_url: 'https://via.placeholder.com/300x200?text=Pizza',
-                available: true,
-                rating: 4.8,
-                prep_time: 15
-            },
-            {
-                id: '2',
-                name: 'Chicken Alfredo',
-                description: 'Creamy pasta with grilled chicken',
-                price: 16.99,
-                category: 'Pasta',
-                image_url: 'https://via.placeholder.com/300x200?text=Pasta',
-                available: true,
-                rating: 4.6,
-                prep_time: 12
-            },
-            {
-                id: '3',
-                name: 'Caesar Salad',
-                description: 'Fresh romaine lettuce with Caesar dressing',
-                price: 10.99,
-                category: 'Salads',
-                image_url: 'https://via.placeholder.com/300x200?text=Salad',
-                available: true,
-                rating: 4.3,
-                prep_time: 8
-            },
-            {
-                id: '4',
-                name: 'Pepperoni Pizza',
-                description: 'Classic pepperoni with mozzarella',
-                price: 16.99,
-                category: 'Pizza',
-                image_url: 'https://via.placeholder.com/300x200?text=Pepperoni',
-                available: true,
-                rating: 4.7,
-                prep_time: 15
-            },
-            {
-                id: '5',
-                name: 'Tiramisu',
-                description: 'Classic Italian dessert',
-                price: 7.99,
-                category: 'Desserts',
-                image_url: 'https://via.placeholder.com/300x200?text=Tiramisu',
-                available: true,
-                rating: 4.9,
-                prep_time: 5
-            }
-        ];
+        if (storeId === 'dra-veronica-rosas') {
+            // Dr. Verónica's Academic Services
+            mockStore = {
+                id: storeId,
+                name: 'Dra. Verónica Carolina Rosas Espinoza',
+                description: 'Bióloga especialista en biodiversidad, autora científica y consultora académica',
+                logo_url: '/images/stores/dra-veronica-rosas/logo.jpg',
+                phone: '+52 (33) 1234-5678',
+                address: 'Zapopan, Jalisco, México',
+                hours: 'Lun-Vie: 9:00 AM - 6:00 PM',
+                rating: 5.0
+            };
+
+            mockMenuItems = [
+                {
+                    id: '1',
+                    name: 'Estudio de Biodiversidad Completo',
+                    description: 'Evaluación integral de ecosistemas, inventario de especies y análisis de conservación',
+                    price: 15000,
+                    category: 'Estudios Ambientales',
+                    image_url: '/images/stores/dra-veronica-rosas/services/biodiversity-study.jpg',
+                    available: true,
+                    rating: 5.0,
+                    prep_time: 30
+                },
+                {
+                    id: '2',
+                    name: 'Consultoría en Conservación',
+                    description: 'Asesoría especializada en estrategias de conservación y manejo de recursos naturales',
+                    price: 2500,
+                    category: 'Consultoría',
+                    image_url: '/images/stores/dra-veronica-rosas/services/consultation.jpg',
+                    available: true,
+                    rating: 5.0,
+                    prep_time: 3
+                },
+                {
+                    id: '3',
+                    name: 'Conferencia "Biodiversidad en México"',
+                    description: 'Presentación especializada sobre la riqueza biológica mexicana y su conservación',
+                    price: 8000,
+                    category: 'Conferencias',
+                    image_url: '/images/stores/dra-veronica-rosas/services/conference.jpg',
+                    available: true,
+                    rating: 4.9,
+                    prep_time: 2
+                },
+                {
+                    id: '4',
+                    name: 'Libro: "Reptiles de Jalisco"',
+                    description: 'Guía completa ilustrada de especies de reptiles endémicas de Jalisco',
+                    price: 450,
+                    category: 'Publicaciones',
+                    image_url: '/images/stores/dra-veronica-rosas/services/book-reptiles.jpg',
+                    available: true,
+                    rating: 4.8,
+                    prep_time: 1
+                },
+                {
+                    id: '5',
+                    name: 'Taller de Identificación de Especies',
+                    description: 'Curso práctico para identificación de flora y fauna nativa',
+                    price: 3500,
+                    category: 'Educación',
+                    image_url: '/images/stores/dra-veronica-rosas/services/workshop.jpg',
+                    available: true,
+                    rating: 4.9,
+                    prep_time: 8
+                },
+                {
+                    id: '6',
+                    name: 'Asesoría en Proyectos de Investigación',
+                    description: 'Orientación académica para tesis y proyectos de investigación en biología',
+                    price: 1800,
+                    category: 'Consultoría',
+                    image_url: '/images/stores/dra-veronica-rosas/services/research-advisory.jpg',
+                    available: true,
+                    rating: 5.0,
+                    prep_time: 2
+                }
+            ];
+        } else {
+            // Default restaurant data (Bella Italia or others)
+            mockStore = {
+                id: storeId || '1',
+                name: 'Bella Italia',
+                description: 'Authentic Italian cuisine made with love',
+                logo_url: '/images/stores/bella-italia/logo.jpg',
+                phone: '+1 (555) 123-4567',
+                address: '123 Main St, City, State 12345',
+                hours: 'Mon-Sun: 11:00 AM - 10:00 PM',
+                rating: 4.5
+            };
+
+            mockMenuItems = [
+                {
+                    id: '1',
+                    name: 'Margherita Pizza',
+                    description: 'Fresh tomatoes, mozzarella, basil',
+                    price: 14.99,
+                    category: 'Pizza',
+                    image_url: '/images/stores/bella-italia/menu/margherita-pizza.jpg',
+                    available: true,
+                    rating: 4.8,
+                    prep_time: 15
+                },
+                {
+                    id: '2',
+                    name: 'Chicken Alfredo',
+                    description: 'Creamy pasta with grilled chicken',
+                    price: 16.99,
+                    category: 'Pasta',
+                    image_url: '/images/stores/bella-italia/menu/chicken-alfredo.jpg',
+                    available: true,
+                    rating: 4.6,
+                    prep_time: 12
+                },
+                {
+                    id: '3',
+                    name: 'Caesar Salad',
+                    description: 'Fresh romaine lettuce with Caesar dressing',
+                    price: 10.99,
+                    category: 'Salads',
+                    image_url: '/images/stores/bella-italia/menu/caesar-salad.jpg',
+                    available: true,
+                    rating: 4.3,
+                    prep_time: 8
+                },
+                {
+                    id: '4',
+                    name: 'Pepperoni Pizza',
+                    description: 'Classic pepperoni with mozzarella',
+                    price: 16.99,
+                    category: 'Pizza',
+                    image_url: '/images/stores/bella-italia/menu/pepperoni-pizza.jpg',
+                    available: true,
+                    rating: 4.7,
+                    prep_time: 15
+                },
+                {
+                    id: '5',
+                    name: 'Tiramisu',
+                    description: 'Classic Italian dessert',
+                    price: 7.99,
+                    category: 'Desserts',
+                    image_url: '/images/stores/bella-italia/menu/tiramisu.jpg',
+                    available: true,
+                    rating: 4.9,
+                    prep_time: 5
+                }
+            ];
+        }
 
         setStore(mockStore);
         setMenuItems(mockMenuItems);
@@ -185,7 +326,10 @@ const OrderPage: React.FC = () => {
         e.preventDefault();
 
         if (cart.length === 0) {
-            alert('Please add items to your cart first');
+            const message = isAcademicServices
+                ? 'Por favor seleccione al menos un servicio'
+                : 'Please add items to your cart first';
+            alert(message);
             return;
         }
 
@@ -220,7 +364,10 @@ const OrderPage: React.FC = () => {
             setShowCart(false);
         } catch (error) {
             console.error('Error placing order:', error);
-            alert('Error placing order. Please try again.');
+            const errorMessage = isAcademicServices
+                ? 'Error al enviar la solicitud. Por favor intente de nuevo.'
+                : 'Error placing order. Please try again.';
+            alert(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -231,7 +378,7 @@ const OrderPage: React.FC = () => {
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading menu...</p>
+                    <p className="text-gray-600">{getServiceText('loadingMenu')}</p>
                 </div>
             </div>
         );
@@ -244,8 +391,8 @@ const OrderPage: React.FC = () => {
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Check className="w-8 h-8 text-green-600" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
-                    <p className="text-gray-600 mb-6">Thank you for your order. We'll notify you when it's ready.</p>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{getServiceText('orderPlaced')}</h2>
+                    <p className="text-gray-600 mb-6">{getServiceText('orderComplete')}</p>
                     <button
                         onClick={() => {
                             setOrderComplete(false);
@@ -254,13 +401,13 @@ const OrderPage: React.FC = () => {
                                 customer_phone: '',
                                 customer_email: '',
                                 delivery_address: '',
-                                payment_method: 'cash',
+                                payment_method: isAcademicServices ? 'transferencia' : 'cash',
                                 special_instructions: ''
                             });
                         }}
                         className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                     >
-                        Place Another Order
+                        {isAcademicServices ? 'Solicitar Otros Servicios' : 'Place Another Order'}
                     </button>
                 </div>
             </div>
@@ -287,7 +434,7 @@ const OrderPage: React.FC = () => {
                             className="relative bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
                         >
                             <ShoppingCart className="w-5 h-5 mr-2" />
-                            Cart ({getTotalItems()})
+                            {getServiceText('cart')} ({getTotalItems()})
                             {getTotalItems() > 0 && (
                                 <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
                                     {getTotalItems()}
@@ -349,12 +496,20 @@ const OrderPage: React.FC = () => {
                                                 src={item.image_url}
                                                 alt={item.name}
                                                 className="w-full md:w-48 h-32 object-cover rounded-lg mb-4 md:mb-0 md:mr-6"
+                                                onError={(e) => {
+                                                    // Fallback to placeholder if image fails to load
+                                                    const img = e.target as HTMLImageElement;
+                                                    const fallback = isAcademicServices
+                                                        ? '/images/placeholders/service-default.jpg'
+                                                        : '/images/placeholders/food-default.jpg';
+                                                    img.src = fallback;
+                                                }}
                                             />
                                         )}
                                         <div className="flex-1">
                                             <div className="flex justify-between items-start mb-2">
                                                 <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
-                                                <span className="text-lg font-bold text-green-600">${item.price.toFixed(2)}</span>
+                                                <span className="text-lg font-bold text-green-600">{formatPrice(item.price)}</span>
                                             </div>
                                             <p className="text-gray-600 mb-3">{item.description}</p>
                                             <div className="flex items-center justify-between">
@@ -368,7 +523,7 @@ const OrderPage: React.FC = () => {
                                                     {item.prep_time && (
                                                         <div className="flex items-center">
                                                             <Clock className="w-4 h-4 mr-1" />
-                                                            <span>{item.prep_time} min</span>
+                                                            <span>{item.prep_time} {getServiceText('min')}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -400,7 +555,7 @@ const OrderPage: React.FC = () => {
                                                                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                                                 }`}
                                                         >
-                                                            {item.available ? 'Add to Cart' : 'Unavailable'}
+                                                            {item.available ? getServiceText('addToCart') : getServiceText('unavailable')}
                                                         </button>
                                                     )}
                                                 </div>
@@ -415,10 +570,10 @@ const OrderPage: React.FC = () => {
                     {/* Cart/Order Form Section */}
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-24">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Order</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">{getServiceText('cart')}</h3>
 
                             {cart.length === 0 ? (
-                                <p className="text-gray-500 text-center py-8">Your cart is empty</p>
+                                <p className="text-gray-500 text-center py-8">{getServiceText('cartEmpty')}</p>
                             ) : (
                                 <div>
                                     {/* Cart Items */}
@@ -427,7 +582,7 @@ const OrderPage: React.FC = () => {
                                             <div key={item.id} className="flex items-center justify-between">
                                                 <div className="flex-1">
                                                     <h4 className="font-medium text-gray-900">{item.name}</h4>
-                                                    <p className="text-sm text-gray-600">${item.price.toFixed(2)} × {item.quantity}</p>
+                                                    <p className="text-sm text-gray-600">{formatPrice(item.price)} × {item.quantity}</p>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
                                                     <button
@@ -451,8 +606,8 @@ const OrderPage: React.FC = () => {
                                     {/* Total */}
                                     <div className="border-t pt-4 mb-6">
                                         <div className="flex justify-between items-center text-lg font-semibold">
-                                            <span>Total:</span>
-                                            <span className="text-green-600">${getTotalPrice().toFixed(2)}</span>
+                                            <span>{getServiceText('total')}</span>
+                                            <span className="text-green-600">{formatPrice(getTotalPrice())}</span>
                                         </div>
                                     </div>
 
@@ -460,7 +615,7 @@ const OrderPage: React.FC = () => {
                                     <form onSubmit={handlePlaceOrder} className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Name *
+                                                {isAcademicServices ? 'Nombre' : 'Name'} *
                                             </label>
                                             <input
                                                 type="text"
@@ -474,7 +629,7 @@ const OrderPage: React.FC = () => {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Phone *
+                                                {isAcademicServices ? 'Teléfono' : 'Phone'} *
                                             </label>
                                             <input
                                                 type="tel"
@@ -501,7 +656,7 @@ const OrderPage: React.FC = () => {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Delivery Address *
+                                                {getServiceText('deliveryAddress')} *
                                             </label>
                                             <textarea
                                                 name="delivery_address"
@@ -510,12 +665,13 @@ const OrderPage: React.FC = () => {
                                                 required
                                                 rows={3}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder={isAcademicServices ? "Dirección completa y detalles de contacto" : "Delivery address"}
                                             />
                                         </div>
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Payment Method
+                                                {getServiceText('payment')}
                                             </label>
                                             <select
                                                 name="payment_method"
@@ -523,15 +679,26 @@ const OrderPage: React.FC = () => {
                                                 onChange={handleInputChange}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             >
-                                                <option value="cash">Cash on Delivery</option>
-                                                <option value="card">Credit Card</option>
-                                                <option value="paypal">PayPal</option>
+                                                {isAcademicServices ? (
+                                                    <>
+                                                        <option value="transferencia">Transferencia Bancaria</option>
+                                                        <option value="efectivo">Efectivo</option>
+                                                        <option value="cheque">Cheque</option>
+                                                        <option value="paypal">PayPal</option>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <option value="cash">Cash on Delivery</option>
+                                                        <option value="card">Credit Card</option>
+                                                        <option value="paypal">PayPal</option>
+                                                    </>
+                                                )}
                                             </select>
                                         </div>
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Special Instructions
+                                                {getServiceText('specialInstructions')}
                                             </label>
                                             <textarea
                                                 name="special_instructions"
@@ -539,7 +706,7 @@ const OrderPage: React.FC = () => {
                                                 onChange={handleInputChange}
                                                 rows={2}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                placeholder="Any special requests?"
+                                                placeholder={getServiceText('specialPlaceholder')}
                                             />
                                         </div>
 
@@ -551,7 +718,7 @@ const OrderPage: React.FC = () => {
                                                     : 'bg-green-600 hover:bg-green-700'
                                                 } text-white`}
                                         >
-                                            {loading ? 'Placing Order...' : 'Place Order'}
+                                            {loading ? getServiceText('loading') : getServiceText('placeOrder')}
                                         </button>
                                     </form>
                                 </div>
