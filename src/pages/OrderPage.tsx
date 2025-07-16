@@ -356,37 +356,45 @@ const OrderPage: React.FC = () => {
             const stripe = await stripePromise;
             if (!stripe) throw new Error('Stripe failed to load');
 
-            // For now, we'll simulate the checkout process
-            // In production, you'd create a checkout session on your backend
-            console.log('Creating Stripe checkout session with:', {
-                items: cart.map(item => ({
-                    name: item.name,
-                    description: item.description,
-                    price: item.price,
-                    quantity: item.quantity
-                })),
-                customer: {
-                    name: orderForm.customer_name,
-                    email: orderForm.customer_email,
-                    phone: orderForm.customer_phone
+            // Create checkout session on backend
+            const response = await fetch('/.netlify/functions/create-checkout-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                store_id: storeId,
-                currency: isAcademicServices ? 'mxn' : 'usd',
-                locale: isAcademicServices ? 'es' : 'en'
+                body: JSON.stringify({
+                    items: cart.map(item => ({
+                        name: item.name,
+                        description: item.description,
+                        price: item.price,
+                        quantity: item.quantity
+                    })),
+                    customer: {
+                        name: orderForm.customer_name,
+                        email: orderForm.customer_email,
+                        phone: orderForm.customer_phone
+                    },
+                    store_id: storeId,
+                    currency: isAcademicServices ? 'mxn' : 'usd',
+                    locale: isAcademicServices ? 'es' : 'en'
+                }),
             });
 
-            // Simulate successful payment for demo
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
 
-            // In production, this would be:
-            // const response = await fetch('/api/create-checkout-session', { ... });
-            // const session = await response.json();
-            // const result = await stripe.redirectToCheckout({ sessionId: session.id });
+            const session = await response.json();
 
-            // For demo - show success
-            setOrderComplete(true);
-            setCart([]);
-            setShowCart(false);
+            // Redirect to Stripe Checkout
+            const result = await stripe.redirectToCheckout({
+                sessionId: session.id,
+            });
+
+            if (result.error) {
+                console.error('Stripe error:', result.error);
+                alert(result.error.message);
+            }
 
         } catch (error) {
             console.error('Payment error:', error);
