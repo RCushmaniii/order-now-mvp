@@ -1,7 +1,9 @@
-// netlify/functions/create-checkout-session.js
-const stripe = require('stripe')(process.env.STRIPE_SANDBOX_SECRET_KEY);
+// netlify/functions/create-checkout-session.mjs
+import Stripe from 'stripe';
 
-exports.handler = async (event, context) => {
+const stripe = new Stripe(process.env.STRIPE_SANDBOX_SECRET_KEY);
+
+export async function handler(event, context) {
     // Enable CORS for all origins during development
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -59,7 +61,7 @@ exports.handler = async (event, context) => {
         console.log('Line items created:', lineItems);
 
         // Get the origin for redirect URLs
-        const origin = event.headers.origin || event.headers.referer?.replace(/\/$/, '') || 'https://tienda.rfiiidev.com';
+        const origin = event.headers.origin || event.headers.referer?.replace(/\/$/, '') || 'https://yapanow.netlify.app';
 
         // Create Stripe checkout session
         const session = await stripe.checkout.sessions.create({
@@ -103,4 +105,4 @@ exports.handler = async (event, context) => {
             }),
         };
     }
-};
+}

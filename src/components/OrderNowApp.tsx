@@ -16,8 +16,8 @@ const mockMenuItems: MenuItem[] = [
   {
     id: 1,
     name: 'Classic Burger',
-    price: 12.99,
-    originalPrice: 15.99,
+    price: 199.99, // ~$10 USD
+    originalPrice: 249.99,
     category: 'Burgers',
     description: 'Beef patty, lettuce, tomato, onion, pickles',
     image: generatePlaceholder('Classic Burger', '8B4513', 'ffffff'),
@@ -29,7 +29,7 @@ const mockMenuItems: MenuItem[] = [
   {
     id: 2,
     name: 'Chicken Sandwich',
-    price: 11.99,
+    price: 179.99, // ~$9 USD
     category: 'Sandwiches',
     description: 'Grilled chicken breast, mayo, lettuce',
     image: generatePlaceholder('Chicken Sandwich', 'D2691E', 'ffffff'),
@@ -40,7 +40,7 @@ const mockMenuItems: MenuItem[] = [
   {
     id: 3,
     name: 'Margherita Pizza',
-    price: 15.99,
+    price: 299.99, // ~$15 USD
     category: 'Pizza',
     description: 'Fresh mozzarella, tomato sauce, basil',
     image: generatePlaceholder('Margherita Pizza', 'FF6347', 'ffffff'),
@@ -51,7 +51,7 @@ const mockMenuItems: MenuItem[] = [
   {
     id: 4,
     name: 'Caesar Salad',
-    price: 9.99,
+    price: 149.99, // ~$7.50 USD
     category: 'Salads',
     description: 'Romaine lettuce, parmesan, croutons',
     image: generatePlaceholder('Caesar Salad', '228B22', 'ffffff'),
@@ -62,8 +62,8 @@ const mockMenuItems: MenuItem[] = [
   {
     id: 5,
     name: 'Chocolate Shake',
-    price: 5.99,
-    originalPrice: 7.99,
+    price: 89.99, // ~$4.50 USD
+    originalPrice: 119.99,
     category: 'Beverages',
     description: 'Rich chocolate milkshake',
     image: generatePlaceholder('Chocolate Shake', '8B4513', 'ffffff'),
@@ -75,7 +75,7 @@ const mockMenuItems: MenuItem[] = [
   {
     id: 6,
     name: 'Fish Tacos',
-    price: 13.99,
+    price: 229.99, // ~$11.50 USD
     category: 'Tacos',
     description: 'Fresh fish, cabbage slaw, lime crema',
     image: generatePlaceholder('Fish Tacos', 'FF8C00', 'ffffff'),
@@ -86,9 +86,9 @@ const mockMenuItems: MenuItem[] = [
 ];
 
 const mockOrders: Order[] = [
-  { id: 1, customerName: 'John Doe', phone: '+1234567890', total: 28.97, status: 'pending', items: [{ name: 'Classic Burger', quantity: 2, price: 12.99 }], timestamp: new Date(Date.now() - 1000 * 60 * 5) },
-  { id: 2, customerName: 'Jane Smith', phone: '+1234567891', total: 15.99, status: 'preparing', items: [{ name: 'Margherita Pizza', quantity: 1, price: 15.99 }], timestamp: new Date(Date.now() - 1000 * 60 * 15) },
-  { id: 3, customerName: 'Mike Johnson', phone: '+1234567892', total: 21.98, status: 'ready', items: [{ name: 'Chicken Sandwich', quantity: 1, price: 11.99 }, { name: 'Caesar Salad', quantity: 1, price: 9.99 }], timestamp: new Date(Date.now() - 1000 * 60 * 25) }
+  { id: 1, customerName: 'John Doe', phone: '+1234567890', total: 199.97, status: 'pending', items: [{ name: 'Classic Burger', quantity: 2, price: 12.99 }], timestamp: new Date(Date.now() - 1000 * 60 * 5) },
+  { id: 2, customerName: 'Jane Smith', phone: '+1234567891', total: 299.97, status: 'preparing', items: [{ name: 'Margherita Pizza', quantity: 1, price: 15.99 }], timestamp: new Date(Date.now() - 1000 * 60 * 15) },
+  { id: 3, customerName: 'Mike Johnson', phone: '+1234567892', total: 229.97, status: 'ready', items: [{ name: 'Chicken Sandwich', quantity: 1, price: 11.99 }, { name: 'Caesar Salad', quantity: 1, price: 9.99 }], timestamp: new Date(Date.now() - 1000 * 60 * 25) }
 ];
 
 interface OrderNowAppProps {
