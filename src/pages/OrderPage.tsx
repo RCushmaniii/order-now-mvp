@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ShoppingCart, Plus, Minus, Check, Clock, Star } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Check, Clock, Star, CreditCard } from 'lucide-react';
+import { loadStripe } from '@stripe/stripe-js';
+
+// Initialize Stripe with Vite environment variable
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 // Types
 interface MenuItem {
@@ -48,12 +52,13 @@ const OrderPage: React.FC = () => {
     const [orderComplete, setOrderComplete] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [showCart, setShowCart] = useState(false);
+    const [paymentLoading, setPaymentLoading] = useState(false);
     const [orderForm, setOrderForm] = useState<OrderFormData>({
         customer_name: '',
         customer_phone: '',
         customer_email: '',
         delivery_address: '',
-        payment_method: 'cash',
+        payment_method: 'stripe',
         special_instructions: ''
     });
 
@@ -66,19 +71,22 @@ const OrderPage: React.FC = () => {
             const academicTexts: { [key: string]: string } = {
                 'cart': 'Servicios Solicitados',
                 'addToCart': 'Solicitar Servicio',
-                'placeOrder': 'Enviar Solicitud',
-                'orderPlaced': '¡Solicitud Enviada!',
-                'orderComplete': 'Gracias por su solicitud. Nos pondremos en contacto pronto.',
+                'placeOrder': 'Proceder al Pago',
+                'orderPlaced': '¡Pago Exitoso!',
+                'orderComplete': 'Gracias por su pago. Nos pondremos en contacto pronto para coordinar el servicio.',
                 'deliveryAddress': 'Información de Contacto',
                 'specialInstructions': 'Detalles Adicionales',
                 'specialPlaceholder': '¿Algún detalle específico sobre el servicio requerido?',
-                'total': 'Total Estimado:',
-                'loading': 'Enviando solicitud...',
+                'total': 'Total a Pagar:',
+                'loading': 'Procesando pago...',
                 'cartEmpty': 'No hay servicios seleccionados',
                 'min': 'días hábiles',
-                'payment': 'Forma de Pago Preferida',
+                'payment': 'Método de Pago',
                 'loadingMenu': 'Cargando servicios...',
-                'unavailable': 'No Disponible'
+                'unavailable': 'No Disponible',
+                'payWithStripe': 'Pagar con Tarjeta',
+                'paymentSecure': 'Pago 100% Seguro',
+                'submitOrder': 'Enviar Solicitud'
             };
             return academicTexts[key] || key;
         }
@@ -86,19 +94,22 @@ const OrderPage: React.FC = () => {
         const restaurantTexts: { [key: string]: string } = {
             'cart': 'Your Order',
             'addToCart': 'Add to Cart',
-            'placeOrder': 'Place Order',
-            'orderPlaced': 'Order Placed Successfully!',
-            'orderComplete': 'Thank you for your order. We\'ll notify you when it\'s ready.',
+            'placeOrder': 'Proceed to Payment',
+            'orderPlaced': 'Payment Successful!',
+            'orderComplete': 'Thank you for your payment. We\'ll notify you when your order is ready.',
             'deliveryAddress': 'Delivery Address',
             'specialInstructions': 'Special Instructions',
             'specialPlaceholder': 'Any special requests?',
             'total': 'Total:',
-            'loading': 'Placing Order...',
+            'loading': 'Processing payment...',
             'cartEmpty': 'Your cart is empty',
             'min': 'min',
             'payment': 'Payment Method',
             'loadingMenu': 'Loading menu...',
-            'unavailable': 'Unavailable'
+            'unavailable': 'Unavailable',
+            'payWithStripe': 'Pay with Card',
+            'paymentSecure': '100% Secure Payment',
+            'submitOrder': 'Place Order'
         };
         return restaurantTexts[key] || key;
     };
@@ -322,8 +333,79 @@ const OrderPage: React.FC = () => {
         setOrderForm(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleStripePayment = async () => {
+        if (cart.length === 0) {
+            const message = isAcademicServices
+                ? 'Por favor seleccione al menos un servicio'
+                : 'Please add items to your cart first';
+            alert(message);
+            return;
+        }
+
+        if (!orderForm.customer_name || !orderForm.customer_phone) {
+            const message = isAcademicServices
+                ? 'Por favor complete su nombre y teléfono'
+                : 'Please fill in your name and phone';
+            alert(message);
+            return;
+        }
+
+        setPaymentLoading(true);
+
+        try {
+            const stripe = await stripePromise;
+            if (!stripe) throw new Error('Stripe failed to load');
+
+            // For now, we'll simulate the checkout process
+            // In production, you'd create a checkout session on your backend
+            console.log('Creating Stripe checkout session with:', {
+                items: cart.map(item => ({
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    quantity: item.quantity
+                })),
+                customer: {
+                    name: orderForm.customer_name,
+                    email: orderForm.customer_email,
+                    phone: orderForm.customer_phone
+                },
+                store_id: storeId,
+                currency: isAcademicServices ? 'mxn' : 'usd',
+                locale: isAcademicServices ? 'es' : 'en'
+            });
+
+            // Simulate successful payment for demo
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // In production, this would be:
+            // const response = await fetch('/api/create-checkout-session', { ... });
+            // const session = await response.json();
+            // const result = await stripe.redirectToCheckout({ sessionId: session.id });
+
+            // For demo - show success
+            setOrderComplete(true);
+            setCart([]);
+            setShowCart(false);
+
+        } catch (error) {
+            console.error('Payment error:', error);
+            const errorMessage = isAcademicServices
+                ? 'Error al procesar el pago. Por favor intente de nuevo.'
+                : 'Payment processing error. Please try again.';
+            alert(errorMessage);
+        } finally {
+            setPaymentLoading(false);
+        }
+    };
+
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (orderForm.payment_method === 'stripe') {
+            await handleStripePayment();
+            return;
+        }
 
         if (cart.length === 0) {
             const message = isAcademicServices
@@ -333,7 +415,7 @@ const OrderPage: React.FC = () => {
             return;
         }
 
-        // Simulate API call
+        // Simulate API call for non-Stripe payments
         setLoading(true);
 
         try {
@@ -401,7 +483,7 @@ const OrderPage: React.FC = () => {
                                 customer_phone: '',
                                 customer_email: '',
                                 delivery_address: '',
-                                payment_method: isAcademicServices ? 'transferencia' : 'cash',
+                                payment_method: isAcademicServices ? 'stripe' : 'cash',
                                 special_instructions: ''
                             });
                         }}
@@ -476,8 +558,8 @@ const OrderPage: React.FC = () => {
                                         key={category}
                                         onClick={() => setSelectedCategory(category)}
                                         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === category
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                             }`}
                                     >
                                         {category}
@@ -497,7 +579,6 @@ const OrderPage: React.FC = () => {
                                                 alt={item.name}
                                                 className="w-full md:w-48 h-32 object-cover rounded-lg mb-4 md:mb-0 md:mr-6"
                                                 onError={(e) => {
-                                                    // Fallback to placeholder if image fails to load
                                                     const img = e.target as HTMLImageElement;
                                                     const fallback = isAcademicServices
                                                         ? '/images/placeholders/service-default.jpg'
@@ -551,8 +632,8 @@ const OrderPage: React.FC = () => {
                                                             onClick={() => addToCart(item)}
                                                             disabled={!item.available}
                                                             className={`px-4 py-2 rounded-lg font-medium transition-colors ${item.available
-                                                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                                                 }`}
                                                         >
                                                             {item.available ? getServiceText('addToCart') : getServiceText('unavailable')}
@@ -681,19 +762,25 @@ const OrderPage: React.FC = () => {
                                             >
                                                 {isAcademicServices ? (
                                                     <>
+                                                        <option value="stripe">💳 Pagar con Tarjeta (Stripe)</option>
                                                         <option value="transferencia">Transferencia Bancaria</option>
                                                         <option value="efectivo">Efectivo</option>
-                                                        <option value="cheque">Cheque</option>
                                                         <option value="paypal">PayPal</option>
                                                     </>
                                                 ) : (
                                                     <>
+                                                        <option value="stripe">💳 Pay with Card (Stripe)</option>
                                                         <option value="cash">Cash on Delivery</option>
-                                                        <option value="card">Credit Card</option>
                                                         <option value="paypal">PayPal</option>
                                                     </>
                                                 )}
                                             </select>
+                                            {orderForm.payment_method === 'stripe' && (
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    <CreditCard className="w-3 h-3 inline mr-1" />
+                                                    {getServiceText('paymentSecure')}
+                                                </p>
+                                            )}
                                         </div>
 
                                         <div>
@@ -712,14 +799,36 @@ const OrderPage: React.FC = () => {
 
                                         <button
                                             type="submit"
-                                            disabled={loading}
-                                            className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${loading
+                                            disabled={loading || paymentLoading}
+                                            className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${loading || paymentLoading
                                                     ? 'bg-gray-400 cursor-not-allowed'
-                                                    : 'bg-green-600 hover:bg-green-700'
-                                                } text-white`}
+                                                    : orderForm.payment_method === 'stripe'
+                                                        ? 'bg-blue-600 hover:bg-blue-700'
+                                                        : 'bg-green-600 hover:bg-green-700'
+                                                } text-white flex items-center justify-center`}
                                         >
-                                            {loading ? getServiceText('loading') : getServiceText('placeOrder')}
+                                            {loading || paymentLoading ? (
+                                                <>
+                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                                    {getServiceText('loading')}
+                                                </>
+                                            ) : orderForm.payment_method === 'stripe' ? (
+                                                <>
+                                                    <CreditCard className="w-4 h-4 mr-2" />
+                                                    {getServiceText('payWithStripe')}
+                                                </>
+                                            ) : (
+                                                getServiceText('submitOrder')
+                                            )}
                                         </button>
+
+                                        {orderForm.payment_method === 'stripe' && (
+                                            <div className="text-center">
+                                                <p className="text-xs text-gray-500">
+                                                    Powered by <span className="font-semibold">Stripe</span>
+                                                </p>
+                                            </div>
+                                        )}
                                     </form>
                                 </div>
                             )}
