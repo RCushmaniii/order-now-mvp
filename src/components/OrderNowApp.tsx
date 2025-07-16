@@ -190,7 +190,8 @@ const OrderNowApp: React.FC<OrderNowAppProps> = () => {
       }
     } catch (error) {
       console.error('Detailed error:', error);
-      alert(`Error processing payment: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Error processing payment: ${errorMessage}`);
     }
   };
 
