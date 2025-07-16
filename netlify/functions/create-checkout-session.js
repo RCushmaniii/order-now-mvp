@@ -1,7 +1,7 @@
 // netlify/functions/create-checkout-session.js
 // This creates a Netlify function for Stripe checkout
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SANDBOX_SECRET_KEY);
 
 exports.handler = async (event, context) => {
     // Enable CORS

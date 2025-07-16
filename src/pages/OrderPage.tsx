@@ -4,7 +4,8 @@ import { ShoppingCart, Plus, Minus, Check, Clock, Star, CreditCard } from 'lucid
 import { loadStripe } from '@stripe/stripe-js';
 
 // Initialize Stripe with Vite environment variable
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+//const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_SANDBOX_PUBLISHABLE_KEY);
 
 // Types
 interface MenuItem {
@@ -809,10 +810,10 @@ const OrderPage: React.FC = () => {
                                             type="submit"
                                             disabled={loading || paymentLoading}
                                             className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${loading || paymentLoading
-                                                    ? 'bg-gray-400 cursor-not-allowed'
-                                                    : orderForm.payment_method === 'stripe'
-                                                        ? 'bg-blue-600 hover:bg-blue-700'
-                                                        : 'bg-green-600 hover:bg-green-700'
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : orderForm.payment_method === 'stripe'
+                                                    ? 'bg-blue-600 hover:bg-blue-700'
+                                                    : 'bg-green-600 hover:bg-green-700'
                                                 } text-white flex items-center justify-center`}
                                         >
                                             {loading || paymentLoading ? (
