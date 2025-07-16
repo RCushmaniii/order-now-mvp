@@ -1,23 +1,28 @@
-import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { AppErrorBoundary } from './components/ErrorBoundary'
-import OrderPage from './pages/OrderPage'
-import StoreDirectory from './pages/StoreDirectory'
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { AppErrorBoundary } from './components/ErrorBoundary';
+import OrderNowApp from './components/OrderNowApp';
+import OrderPage from './pages/OrderPage';
+import OrderSuccess from './pages/OrderSuccess';
 import MarketingPage from './pages/MarketingPage';
+import StoreDirectory from './pages/StoreDirectory';
+
+// Import your logos - adjust paths as needed
+import viteLogo from '/vite.svg';
+import reactLogo from './assets/react.svg';
 
 // Test component that will trigger error boundary
 function TestErrorBoundary() {
   const [shouldError, setShouldError] = useState(false);
+
   if (shouldError) {
     throw new Error("This error will be caught by the error boundary!");
   }
+
   return (
     <button
       onClick={() => setShouldError(true)}
-      className="w-full bg-red-500 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+      className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
     >
       Test Error Boundary (Will show fallback UI)
     </button>
@@ -25,8 +30,8 @@ function TestErrorBoundary() {
 }
 
 function HomePage() {
-  const [count, setCount] = useState(0)
-  const navigate = useNavigate()
+  const [count, setCount] = useState(0);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -67,6 +72,13 @@ function HomePage() {
                 >
                   Order Food
                 </Link>
+                {/* Add link to the new OrderNowApp */}
+                <Link
+                  to="/order-now"
+                  className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Order Now Demo
+                </Link>
               </div>
             </div>
           </div>
@@ -75,10 +87,10 @@ function HomePage() {
         {/* Header Section */}
         <div className="text-center mb-12">
           <div className="flex justify-center items-center space-x-8 mb-6">
-            <a href="https://vite.dev" target="_blank" className="transition-transform hover:scale-110">
+            <a href="https://vite.dev" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
               <img src={viteLogo} className="logo w-16 h-16" alt="Vite logo" />
             </a>
-            <a href="https://react.dev" target="_blank" className="transition-transform hover:scale-110">
+            <a href="https://react.dev" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
               <img src={reactLogo} className="logo react w-16 h-16" alt="React logo" />
             </a>
           </div>
@@ -133,23 +145,23 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Store Directory */}
+          {/* New OrderNowApp Demo */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">🏪 Store Directory</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">🎨 Modern Order UI</h2>
             <p className="text-gray-600 mb-6">
-              Browse all available businesses and services in one central location.
+              Experience the new modern ordering interface with WhatsApp-inspired design.
             </p>
             <button
-              onClick={() => navigate('/stores')}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors transform hover:scale-105 active:scale-95 w-full mb-4"
+              onClick={() => navigate('/order-now')}
+              className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition-colors transform hover:scale-105 active:scale-95 w-full mb-4"
             >
-              🚀 Browse All Stores
+              🚀 Try Modern UI
             </button>
             <div className="text-sm text-gray-500">
-              <p>✅ Multi-business platform</p>
-              <p>✅ Service categorization</p>
-              <p>✅ Professional showcase</p>
-              <p>✅ Easy navigation</p>
+              <p>✅ WhatsApp design language</p>
+              <p>✅ Modern card layouts</p>
+              <p>✅ Stripe integration ready</p>
+              <p>✅ Admin dashboard included</p>
             </div>
           </div>
         </div>
@@ -254,7 +266,7 @@ function HomePage() {
                   <li>• Facebook deep link integration</li>
                   <li>• Store directory system</li>
                   <li>• Spanish/English interfaces</li>
-                  <li>• Local image management</li>
+                  <li>• Modern OrderNowApp UI</li>
                 </ul>
               </div>
             </div>
@@ -292,11 +304,14 @@ function HomePage() {
             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
               Facebook Ready
             </span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800">
+              Modern UI
+            </span>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function App() {
@@ -308,12 +323,16 @@ function App() {
           <Route path="/marketing" element={<MarketingPage />} />
           <Route path="/stores" element={<StoreDirectory />} />
           <Route path="/order/:storeId" element={<OrderPage />} />
+          {/* New route for the modern OrderNowApp */}
+          <Route path="/order-now" element={<OrderNowApp />} />
+          {/* Success page for Stripe redirects */}
+          <Route path="/order/success" element={<OrderSuccess />} />
           {/* Legacy route for backward compatibility */}
           <Route path="/order" element={<OrderPage />} />
         </Routes>
       </Router>
     </AppErrorBoundary>
-  )
+  );
 }
 
-export default App
+export default App;
