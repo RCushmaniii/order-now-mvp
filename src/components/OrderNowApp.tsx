@@ -145,6 +145,8 @@ const OrderNowApp: React.FC<OrderNowAppProps> = () => {
 
   // Place order with Stripe integration
   const placeOrder = async () => {
+    console.log('Starting order placement...');
+
     try {
       const response = await fetch('/.netlify/functions/create-checkout-session', {
         method: 'POST',
@@ -169,16 +171,26 @@ const OrderNowApp: React.FC<OrderNowAppProps> = () => {
         }),
       });
 
-      const { url } = await response.json();
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
 
-      if (url) {
-        window.location.href = url;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Success data:', data);
+
+      if (data.url) {
+        window.location.href = data.url;
       } else {
-        alert('Error creating checkout session');
+        alert('Error: No checkout URL received');
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error processing payment');
+      console.error('Detailed error:', error);
+      alert(`Error processing payment: ${error.message}`);
     }
   };
 

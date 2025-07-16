@@ -358,7 +358,8 @@ const OrderPage: React.FC = () => {
             if (!stripe) throw new Error('Stripe failed to load');
 
             // Create checkout session on backend
-            const response = await fetch('/.netlify/functions/create-checkout-session', {
+            //const response = await fetch('/.netlify/functions/create-checkout-session', {
+            const response = await fetch('https://tienda.rfiiidev.com/.netlify/functions/create-checkout-session', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
