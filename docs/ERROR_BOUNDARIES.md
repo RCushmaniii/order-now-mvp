@@ -68,11 +68,81 @@ src/
 │   ├── ComponentErrorBoundary.tsx     # Reusable component-level boundary
 │   └── EnvironmentErrorBoundary.tsx   # Environment-specific fallbacks
 ├── hooks/
-│   └── useAsyncError.ts              # Hook for async error handling
+│   ├── useAsyncError.ts              # Hook for async error handling
+│   └── useOrderLogic.ts              # Contains custom error classes
 ├── utils/
 │   └── errorReporting.ts             # Error reporting utilities
 └── styles/
     └── error-boundary.css            # Error boundary styles
+```
+
+## Custom Error Classes
+
+YapaNow uses specialized error classes for better error handling and user experience:
+
+### OrderValidationError
+
+Used for order form validation failures:
+
+```typescript
+export class OrderValidationError extends Error {
+    public readonly field?: string;
+    public readonly code?: string;
+
+    constructor(message: string, field?: string, code?: string) {
+        super(message);
+        this.name = 'OrderValidationError';
+        this.field = field;
+        this.code = code;
+        Object.setPrototypeOf(this, OrderValidationError.prototype);
+    }
+}
+```
+
+**Usage Example:**
+```typescript
+if (!orderForm.customer_name) {
+    throw new OrderValidationError(
+        'Customer name is required',
+        'customer_name',
+        'REQUIRED_FIELD'
+    );
+}
+```
+
+### PaymentError
+
+Used for payment processing failures with enhanced error codes:
+
+```typescript
+export class PaymentError extends Error {
+    public readonly code?: string;
+    public readonly statusCode?: number;
+
+    constructor(message: string, code?: string, statusCode?: number) {
+        super(message);
+        this.name = 'PaymentError';
+        this.code = code;
+        this.statusCode = statusCode;
+        Object.setPrototypeOf(this, PaymentError.prototype);
+    }
+}
+```
+
+**Common Error Codes:**
+- `STRIPE_TIMEOUT`: Payment system loading timeout
+- `STRIPE_LOAD_ERROR`: Network error loading Stripe
+- `STRIPE_CONFIG_MISSING`: Missing environment configuration
+- `STRIPE_UNAVAILABLE`: Payment system unavailable
+
+**Usage Example:**
+```typescript
+if (!stripe) {
+    throw new PaymentError(
+        'Payment system unavailable',
+        'STRIPE_UNAVAILABLE'
+    );
+}
 ```
 
 ## Configuration Options

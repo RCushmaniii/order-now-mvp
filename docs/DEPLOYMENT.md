@@ -88,6 +88,25 @@ Use different `.env` files for each environment:
 | `.env.local`       | Machine-specific overrides |
 | `.env.example`     | Safe template (committed)  |
 
+### Required Environment Variables
+
+#### Stripe Payment Integration
+```bash
+# Stripe Configuration (Required for payment processing)
+VITE_STRIPE_SANDBOX_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
+
+# For production, use live keys:
+# VITE_STRIPE_SANDBOX_PUBLISHABLE_KEY=pk_live_your_live_key_here
+```
+
+**Important Notes:**
+- Stripe keys must start with `pk_test_` (sandbox) or `pk_live_` (production)
+- The app will validate the key format on startup and show errors if invalid
+- Missing or invalid Stripe keys will prevent payment processing
+- Environment variables prefixed with `VITE_` are exposed to the frontend
+
+### Security Best Practices
+
 Your `.gitignore` should include:
 
 ```gitignore
