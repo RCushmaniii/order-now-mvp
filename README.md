@@ -376,4 +376,4 @@ Diagnosed and resolved the final notification bug by ensuring the correct config
 
 ---
 
-**YapaNow** - Connecting businesses with customers across all channels 🚀
+**YapaNow** - Connecting businesses with customers across all channel today and tomorrow - YaPedi 🚀
