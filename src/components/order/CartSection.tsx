@@ -2,11 +2,9 @@
 import React from 'react';
 import { CartItem, OrderFormData, MenuItem } from '../../types/order';
 import { Store } from '../../types/store';
-import { WhatsAppStatus } from '../../types/whatsapp';
 import { CartItems } from './CartItems';
 import { CartTotal } from './CartTotal';
 import { OrderForm } from './OrderForm';
-import { WhatsAppToggle } from '../whatsapp/WhatsAppToggle';
 import { getServiceText } from '../../utils/textHelpers';
 
 interface CartSectionProps {
@@ -17,12 +15,8 @@ interface CartSectionProps {
     loading: boolean;
     paymentLoading: boolean;
     totalPrice: number;
-    whatsappEnabled: boolean;
-    whatsappStatus: WhatsAppStatus;
-    whatsappError: string | null;
     onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
     onPlaceOrder: (e: React.FormEvent) => void;
-    onWhatsAppToggle: (enabled: boolean) => void;
     onAddToCart: (item: MenuItem) => void;
     onRemoveFromCart: (itemId: string) => void;
 }
@@ -34,12 +28,8 @@ export const CartSection: React.FC<CartSectionProps> = ({
     loading,
     paymentLoading,
     totalPrice,
-    whatsappEnabled,
-    whatsappStatus,
-    whatsappError,
     onInputChange,
     onPlaceOrder,
-    onWhatsAppToggle,
     onAddToCart,
     onRemoveFromCart
 }) => {
@@ -58,12 +48,8 @@ export const CartSection: React.FC<CartSectionProps> = ({
                         loading={loading}
                         paymentLoading={paymentLoading}
                         totalPrice={totalPrice}
-                        whatsappEnabled={whatsappEnabled}
-                        whatsappStatus={whatsappStatus}
-                        whatsappError={whatsappError}
                         onInputChange={onInputChange}
                         onPlaceOrder={onPlaceOrder}
-                        onWhatsAppToggle={onWhatsAppToggle}
                         onAddToCart={onAddToCart}
                         onRemoveFromCart={onRemoveFromCart}
                     />
@@ -104,12 +90,8 @@ interface CartContentProps {
     loading: boolean;
     paymentLoading: boolean;
     totalPrice: number;
-    whatsappEnabled: boolean;
-    whatsappStatus: WhatsAppStatus;
-    whatsappError: string | null;
     onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
     onPlaceOrder: (e: React.FormEvent) => void;
-    onWhatsAppToggle: (enabled: boolean) => void;
     onAddToCart: (item: MenuItem) => void;
     onRemoveFromCart: (itemId: string) => void;
 }
@@ -121,12 +103,8 @@ const CartContent: React.FC<CartContentProps> = ({
     loading,
     paymentLoading,
     totalPrice,
-    whatsappEnabled,
-    whatsappStatus,
-    whatsappError,
     onInputChange,
     onPlaceOrder,
-    onWhatsAppToggle,
     onAddToCart,
     onRemoveFromCart
 }) => {
@@ -142,14 +120,6 @@ const CartContent: React.FC<CartContentProps> = ({
             <CartTotal
                 totalPrice={totalPrice}
                 isAcademicServices={isAcademicServices}
-            />
-
-            <WhatsAppToggle
-                enabled={whatsappEnabled}
-                status={whatsappStatus}
-                error={whatsappError}
-                isAcademicServices={isAcademicServices}
-                onToggle={onWhatsAppToggle}
             />
 
             <OrderForm

@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+node_modules/**
+
+# Build outputs
+dist/
+dist/**
+build/
+build/**
+
+# Netlify functions - all patterns to ensure they're ignored
+netlify/functions/*.mjs
+netlify/functions/*.js
+netlify/functions/**/*.mjs
+netlify/functions/**/*.js
+**/*.mjs
+*.mjs
+
+# Specific files causing issues
+netlify/functions/send-whatsapp-message.mjs
+netlify/functions/create-checkout-session.mjs
+netlify/functions/whatsapp-webhook.mjs
+
+# Coverage
+coverage/
+coverage/**
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Other
+*.log
+.DS_Store
+.vscode/
+.idea/

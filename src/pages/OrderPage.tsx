@@ -10,7 +10,6 @@ import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { WhatsAppProvider } from '../components/whatsapp/WhatsAppProvider';
 import { useOrderLogic } from '../hooks/useOrderLogic';
 import { useStoreData } from '../hooks/useStoreData';
-import { useWhatsAppNotifications } from '../hooks/useWhatsAppNotifications';
 
 const OrderPage: React.FC = () => {
     const { storeId } = useParams<{ storeId: string }>();
@@ -44,13 +43,6 @@ const OrderPage: React.FC = () => {
         clearError
     } = useOrderLogic(store, menuItems, isAcademicServices);
 
-    const {
-        whatsappEnabled,
-        whatsappStatus,
-        whatsappError,
-        setWhatsappEnabled
-    } = useWhatsAppNotifications();
-
     // Loading state
     if (storeLoading) {
         return <LoadingSpinner message={isAcademicServices ? 'Cargando servicios...' : 'Loading menu...'} />;
@@ -64,7 +56,6 @@ const OrderPage: React.FC = () => {
         customerPhone={orderForm.customer_phone}
         customerName={orderForm.customer_name}
         orderId={`ORDER-${Date.now().toString().slice(-8)}`}
-        enableWhatsApp={whatsappEnabled}
     />
 
     return (
@@ -99,12 +90,8 @@ const OrderPage: React.FC = () => {
                             loading={loading}
                             paymentLoading={paymentLoading}
                             totalPrice={totalPrice}
-                            whatsappEnabled={whatsappEnabled}
-                            whatsappStatus={whatsappStatus}
-                            whatsappError={whatsappError}
                             onInputChange={handleInputChange}
                             onPlaceOrder={handlePlaceOrder}
-                            onWhatsAppToggle={setWhatsappEnabled}
                             onAddToCart={addToCart}
                             onRemoveFromCart={removeFromCart}
                         />
