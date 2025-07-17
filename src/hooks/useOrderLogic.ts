@@ -4,6 +4,7 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
+import type { Stripe } from '@stripe/stripe-js';
 import type { MenuItem, CartItem, OrderFormData } from '../types/order';
 import type { Store } from '../types/store';
 
@@ -44,9 +45,12 @@ const CONFIG = {
 /**
  * Enhanced Stripe initialization with better error handling and fallbacks
  */
+/**
+ * Enhanced Stripe initialization with better error handling and fallbacks
+ */
 const initializeStripe = () => {
     const stripeKey = import.meta.env.VITE_STRIPE_SANDBOX_PUBLISHABLE_KEY;
-    
+
     // Debug logging for development
     if (import.meta.env.DEV) {
         console.log('🔧 Stripe Key Check:', {
@@ -55,27 +59,23 @@ const initializeStripe = () => {
             environment: import.meta.env.MODE
         });
     }
-    
+
     if (!stripeKey) {
         console.error('❌ Stripe publishable key not found in environment variables');
         console.error('Expected variable: VITE_STRIPE_SANDBOX_PUBLISHABLE_KEY');
         return Promise.resolve(null);
     }
-    
+
     if (!stripeKey.startsWith('pk_')) {
         console.error('❌ Invalid Stripe publishable key format. Key should start with "pk_"');
         return Promise.resolve(null);
     }
-    
+
     try {
         console.log('🔄 Initializing Stripe...');
-        
-        return loadStripe(stripeKey, {
-            // Add additional options for better reliability
-            stripeAccount: undefined, // Use default account
-            apiVersion: '2023-10-16', // Use stable API version
-            locale: 'auto' // Auto-detect locale
-        }).then(stripe => {
+
+        // Simplified Stripe initialization - no extra options
+        return loadStripe(stripeKey).then((stripe: Stripe | null) => {
             if (stripe) {
                 console.log('✅ Stripe initialized successfully');
             } else {
@@ -83,7 +83,7 @@ const initializeStripe = () => {
             }
             return stripe;
         });
-        
+
     } catch (error) {
         console.error('❌ Failed to initialize Stripe:', error);
         return Promise.resolve(null);
@@ -971,13 +971,13 @@ export const useOrderLogic = (
             let stripe;
             try {
                 console.log('🔄 Loading Stripe instance...');
-                
+
                 stripe = await Promise.race([
                     stripePromise,
                     new Promise<null>((_, reject) => {
                         setTimeout(() => {
                             reject(new PaymentError(
-                                isAcademicServices 
+                                isAcademicServices
                                     ? 'Tiempo de carga agotado para el sistema de pagos'
                                     : 'Payment system loading timeout',
                                 'STRIPE_TIMEOUT'
@@ -987,9 +987,9 @@ export const useOrderLogic = (
                 ]);
             } catch (error) {
                 console.error('❌ Error loading Stripe:', error);
-                
+
                 throw new PaymentError(
-                    isAcademicServices 
+                    isAcademicServices
                         ? 'No se pudo cargar el sistema de pagos. Verifique su conexión a internet.'
                         : 'Failed to load payment system. Please check your internet connection.',
                     'STRIPE_LOAD_ERROR'
@@ -998,20 +998,20 @@ export const useOrderLogic = (
 
             if (!stripe) {
                 console.error('❌ Stripe instance is null');
-                
+
                 // Check if this is due to missing environment variable
                 const stripeKey = import.meta.env.VITE_STRIPE_SANDBOX_PUBLISHABLE_KEY;
                 if (!stripeKey) {
                     throw new PaymentError(
-                        isAcademicServices 
+                        isAcademicServices
                             ? 'Configuración de pagos incompleta. Contacte al administrador.'
                             : 'Payment configuration incomplete. Please contact support.',
                         'STRIPE_CONFIG_MISSING'
                     );
                 }
-                
+
                 throw new PaymentError(
-                    isAcademicServices 
+                    isAcademicServices
                         ? 'Sistema de pagos no disponible. Por favor intente más tarde.'
                         : 'Payment system unavailable. Please try again later.',
                     'STRIPE_UNAVAILABLE'
@@ -1346,22 +1346,22 @@ export const useOrderLogic = (
     useEffect(() => {
         // Check Stripe configuration on mount
         const stripeKey = import.meta.env.VITE_STRIPE_SANDBOX_PUBLISHABLE_KEY;
-        
+
         if (!stripeKey) {
             console.error('❌ CRITICAL: Stripe publishable key not found!');
             console.error('Please ensure VITE_STRIPE_SANDBOX_PUBLISHABLE_KEY is set in your environment');
-            
+
             setError(
-                isAcademicServices 
+                isAcademicServices
                     ? 'Sistema de pagos no configurado. Contacte al administrador.'
                     : 'Payment system not configured. Please contact support.'
             );
         } else if (!stripeKey.startsWith('pk_')) {
             console.error('❌ CRITICAL: Invalid Stripe key format!');
             console.error('Stripe key should start with "pk_test_" or "pk_live_"');
-            
+
             setError(
-                isAcademicServices 
+                isAcademicServices
                     ? 'Configuración de pagos inválida. Contacte al administrador.'
                     : 'Invalid payment configuration. Please contact support.'
             );

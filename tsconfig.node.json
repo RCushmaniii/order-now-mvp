@@ -1,17 +1,13 @@
 {
   "compilerOptions": {
-    "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "strict": false,
-    "noEmit": false,
-    "verbatimModuleSyntax": false
+    "noEmit": true
   },
   "include": [
-    "vite.config.ts",
-    "netlify/functions/**/*"
+    "vite.config.ts"
   ]
 }
