@@ -351,4 +351,29 @@ For technical support or business inquiries:
 
 ---
 
+Recent Updates & Fixes (July 2025)
+This update represents a major overhaul of the application's stability, type-safety, and architecture to resolve critical build and runtime issues.
+
+Build & Deployment Stability
+Resolved production build failures on Netlify caused by Node.js version incompatibilities (the crypto.hash error).
+
+Stabilized the local development environment by correcting npm installation issues and fixing broken build scripts.
+
+Full Type-Safety Implementation
+Established a strict TypeScript foundation by creating a centralized src/types.ts file to act as the single source of truth for all data structures (Order, MenuItem, CartItem, etc.).
+
+Refactored all components, mock data, and logic to be fully compliant with these new strict types, eliminating dozens of potential runtime errors and improving developer confidence.
+
+Code Architecture Refactor
+Refactored the OrderSuccess page by extracting its complex logic into a dedicated custom hook (useOrderProcessor), vastly improving code separation and making the component purely presentational.
+
+Restructured the main OrderNowApp component to correctly scope its helper components and state, resolving numerous syntax and reference errors.
+
+WhatsApp Notification Service
+Overhauled the whatsappService.ts for improved robustness, featuring better error propagation and simplified, reusable utility functions.
+
+Diagnosed and resolved the final notification bug by ensuring the correct configuration of production environment variables (WHATSAPP_ACCESS_TOKEN, etc.) in the Netlify deployment environment.
+
+---
+
 **YapaNow** - Connecting businesses with customers across all channels 🚀
