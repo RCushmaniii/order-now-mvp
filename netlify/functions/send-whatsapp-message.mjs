@@ -1,253 +1,320 @@
 // netlify/functions/send-whatsapp-message.mjs
-// Sends WhatsApp messages to customers and store owners
+// Complete WhatsApp Business API integration for YapaNow
 
-export async function handler(event, context) {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Content-Type': 'application/json',
-    };
+import { env } from './utils/env-config.mjs';
 
-    // Handle preflight request
-    if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers,
-            body: '',
-        };
-    }
+// ==================== TYPES ====================
 
-    if (event.httpMethod !== 'POST') {
-        return {
-            statusCode: 405,
-            headers,
-            body: JSON.stringify({ error: 'Method not allowed. Use POST.' }),
-        };
-    }
+/**
+ * @typedef {Object} WhatsAppOrderData
+ * @property {string} order_id
+ * @property {string} customer_name
+ * @property {string} customer_phone
+ * @property {string} store_name
+ * @property {string} [store_address]
+ * @property {string} [store_phone]
+ * @property {number} total_amount
+ * @property {string} currency
+ * @property {Array<{name: string, quantity: number, price: number}>} items
+ * @property {string} [delivery_address]
+ * @property {string} [special_instructions]
+ * @property {string} payment_method
+ * @property {'es'|'en'} [language]
+ */
 
-    try {
-        const { messageType, orderData, recipientPhone, customMessage } = JSON.parse(event.body);
+/**
+ * @typedef {Object} WhatsAppResponse
+ * @property {boolean} success
+ * @property {string} [messageId]
+ * @property {string} [timestamp]
+ * @property {string} [error]
+ */
 
-        console.log('Sending WhatsApp message:', { messageType, recipientPhone });
+// ==================== CONFIGURATION ====================
 
-        let messageResult;
+const CONFIG = {
+    // WhatsApp Business API Configuration
+    WHATSAPP_TOKEN: env.WHATSAPP_API_KEY || process.env.WHATSAPP_ACCESS_TOKEN,
+    WHATSAPP_PHONE_NUMBER_ID: env.WHATSAPP_PHONE_NUMBER_ID || process.env.WHATSAPP_PHONE_NUMBER_ID,
+    WHATSAPP_API_URL: env.WHATSAPP_API_BASE_URL || 'https://graph.facebook.com/v18.0',
 
-        switch (messageType) {
-            case 'order_confirmation':
-                messageResult = await sendOrderConfirmation(orderData, recipientPhone);
-                break;
-            case 'order_status_update':
-                messageResult = await sendOrderStatusUpdate(orderData, recipientPhone);
-                break;
-            case 'business_notification':
-                messageResult = await sendBusinessNotification(orderData, recipientPhone);
-                break;
-            case 'custom_message':
-                messageResult = await sendCustomMessage(customMessage, recipientPhone);
-                break;
-            default:
-                throw new Error(`Unknown message type: ${messageType}`);
-        }
+    // Test Configuration
+    TEST_MODE: env.NODE_ENV !== 'production',
+    TEST_CUSTOMER_PHONE: '+523315590572', // Your test phone
 
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({
-                success: true,
-                messageId: messageResult.messages[0].id,
-                timestamp: new Date().toISOString()
-            }),
-        };
+    // Message Configuration
+    MAX_MESSAGE_LENGTH: 4096,
+    RETRY_ATTEMPTS: 3,
+    TIMEOUT: 10000
+};
 
-    } catch (error) {
-        console.error('Error sending WhatsApp message:', error);
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({
-                success: false,
-                error: error.message || 'Failed to send message'
-            }),
-        };
-    }
-}
+// ==================== UTILITIES ====================
 
-async function sendOrderConfirmation(orderData, customerPhone) {
-    const message = {
-        type: 'template',
-        template: {
-            name: 'order_confirmation', // Create this template in WhatsApp Manager
-            language: {
-                code: orderData.language || 'es'
-            },
-            components: [
-                {
-                    type: 'header',
-                    parameters: [
-                        {
-                            type: 'text',
-                            text: orderData.store_name
-                        }
-                    ]
-                },
-                {
-                    type: 'body',
-                    parameters: [
-                        {
-                            type: 'text',
-                            text: orderData.customer_name
-                        },
-                        {
-                            type: 'text',
-                            text: `#${orderData.order_id}`
-                        },
-                        {
-                            type: 'text',
-                            text: formatPrice(orderData.total_amount, orderData.currency)
-                        },
-                        {
-                            type: 'text',
-                            text: orderData.estimated_time || '15-20 minutos'
-                        }
-                    ]
-                }
-            ]
-        }
-    };
-
-    return await sendMessage(customerPhone, message);
-}
-
-async function sendOrderStatusUpdate(orderData, customerPhone) {
-    const statusMessages = {
-        'confirmed': {
-            es: `✅ *Orden Confirmada*\n\n¡Hola ${orderData.customer_name}!\n\nTu orden #${orderData.order_id} ha sido confirmada.\n\n📋 *Resumen:*\n${formatOrderItems(orderData.items)}\n\n💰 *Total:* ${formatPrice(orderData.total_amount, orderData.currency)}\n\n🕐 *Tiempo estimado:* ${orderData.estimated_time || '15-20 minutos'}\n\n📍 *${orderData.store_name}*\n${orderData.store_address}\n\n¡Gracias por tu orden!`,
-            en: `✅ *Order Confirmed*\n\nHi ${orderData.customer_name}!\n\nYour order #${orderData.order_id} has been confirmed.\n\n📋 *Summary:*\n${formatOrderItems(orderData.items)}\n\n💰 *Total:* ${formatPrice(orderData.total_amount, orderData.currency)}\n\n🕐 *Estimated time:* ${orderData.estimated_time || '15-20 minutes'}\n\n📍 *${orderData.store_name}*\n${orderData.store_address}\n\nThank you for your order!`
-        },
-        'preparing': {
-            es: `👨‍🍳 *Preparando tu Orden*\n\n¡Hola ${orderData.customer_name}!\n\nTu orden #${orderData.order_id} se está preparando.\n\n🕐 *Tiempo estimado:* ${orderData.estimated_time || '10-15 minutos'}\n\n📍 *${orderData.store_name}*\n${orderData.store_address}`,
-            en: `👨‍🍳 *Preparing Your Order*\n\nHi ${orderData.customer_name}!\n\nYour order #${orderData.order_id} is being prepared.\n\n🕐 *Estimated time:* ${orderData.estimated_time || '10-15 minutes'}\n\n📍 *${orderData.store_name}*\n${orderData.store_address}`
-        },
-        'ready': {
-            es: `🎉 *¡Orden Lista!*\n\n¡Hola ${orderData.customer_name}!\n\nTu orden #${orderData.order_id} está lista para recoger.\n\n📍 *Recoger en:*\n${orderData.store_name}\n${orderData.store_address}\n\n💰 *Total:* ${formatPrice(orderData.total_amount, orderData.currency)}\n\n¡Te esperamos!`,
-            en: `🎉 *Order Ready!*\n\nHi ${orderData.customer_name}!\n\nYour order #${orderData.order_id} is ready for pickup.\n\n📍 *Pick up at:*\n${orderData.store_name}\n${orderData.store_address}\n\n💰 *Total:* ${formatPrice(orderData.total_amount, orderData.currency)}\n\nWe're waiting for you!`
-        },
-        'completed': {
-            es: `⭐ *Orden Completada*\n\n¡Gracias ${orderData.customer_name}!\n\nTu orden #${orderData.order_id} ha sido completada.\n\n¡Esperamos que hayas disfrutado tu comida!\n\n${orderData.store_name}\n\n¿Te gustaría calificar tu experiencia?`,
-            en: `⭐ *Order Completed*\n\nThank you ${orderData.customer_name}!\n\nYour order #${orderData.order_id} has been completed.\n\nWe hope you enjoyed your meal!\n\n${orderData.store_name}\n\nWould you like to rate your experience?`
-        },
-        'cancelled': {
-            es: `❌ *Orden Cancelada*\n\nHola ${orderData.customer_name},\n\nLamentamos informarte que tu orden #${orderData.order_id} ha sido cancelada.\n\n${orderData.cancellation_reason || 'Razón no especificada'}\n\nSi tienes preguntas, contacta directamente al restaurante.\n\n${orderData.store_name}\n${orderData.store_phone}`,
-            en: `❌ *Order Cancelled*\n\nHi ${orderData.customer_name},\n\nWe're sorry to inform you that your order #${orderData.order_id} has been cancelled.\n\n${orderData.cancellation_reason || 'No reason specified'}\n\nIf you have questions, please contact the restaurant directly.\n\n${orderData.store_name}\n${orderData.store_phone}`
-        }
-    };
-
-    const language = orderData.language || 'es';
-    const messageText = statusMessages[orderData.status]?.[language] ||
-        `Tu orden #${orderData.order_id} tiene estado: ${orderData.status}`;
-
-    const message = {
-        type: 'text',
-        text: {
-            body: messageText
-        }
-    };
-
-    return await sendMessage(customerPhone, message);
-}
-
-async function sendBusinessNotification(orderData, businessPhone) {
-    const messageText = `🆕 *Nueva Orden Recibida*\n\n📋 *Orden #${orderData.order_id}*\n\n👤 *Cliente:* ${orderData.customer_name}\n📞 *Teléfono:* ${orderData.customer_phone}\n\n🛍️ *Productos:*\n${formatOrderItems(orderData.items)}\n\n💰 *Total:* ${formatPrice(orderData.total_amount, orderData.currency)}\n\n📍 *Entrega:* ${orderData.delivery_address}\n\n📝 *Instrucciones:* ${orderData.special_instructions || 'Ninguna'}\n\n💳 *Método de pago:* ${orderData.payment_method}\n\n---\n*Responde a este mensaje para actualizar el estado de la orden*`;
-
-    const message = {
-        type: 'text',
-        text: {
-            body: messageText
-        }
-    };
-
-    return await sendMessage(businessPhone, message);
-}
-
-async function sendCustomMessage(messageText, recipientPhone) {
-    const message = {
-        type: 'text',
-        text: {
-            body: messageText
-        }
-    };
-
-    return await sendMessage(recipientPhone, message);
-}
-
-async function sendMessage(to, message) {
-    const url = `${process.env.WHATSAPP_API_BASE_URL}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`;
-
-    const payload = {
-        messaging_product: 'whatsapp',
-        to: cleanPhoneNumber(to),
-        ...message
-    };
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`WhatsApp API error: ${response.status} - ${JSON.stringify(errorData)}`);
-        }
-
-        const result = await response.json();
-        console.log('Message sent successfully:', result);
-        return result;
-
-    } catch (error) {
-        console.error('Error sending WhatsApp message:', error);
-        throw error;
-    }
-}
-
-function cleanPhoneNumber(phone) {
+/**
+ * Format phone number for WhatsApp API (must include country code)
+ */
+/**
+ * Format phone number for WhatsApp API (must include country code)
+ * @param {string} phone - The phone number to format
+ * @returns {string} Formatted phone number with country code
+ */
+function formatPhoneNumber(phone) {
     // Remove all non-numeric characters
     const cleaned = phone.replace(/\D/g, '');
 
-    // Add country code if missing (default to Mexico +52)
-    if (cleaned.length === 10) {
+    // If starts with 52 (Mexico), keep as is
+    if (cleaned.startsWith('52')) {
+        return cleaned;
+    }
+
+    // If starts with 33 (Guadalajara), add Mexico country code
+    if (cleaned.startsWith('33')) {
         return `52${cleaned}`;
     }
 
-    if (cleaned.length === 12 && cleaned.startsWith('52')) {
-        return cleaned;
+    // Default: assume it's a Mexican number
+    if (cleaned.length === 10) {
+        return `52${cleaned}`;
     }
 
     return cleaned;
 }
 
-function formatPrice(amount, currency = 'MXN') {
-    const currencySymbols = {
-        'MXN': '$',
-        'USD': '$',
-        'EUR': '€'
-    };
+/**
+ * Generate order confirmation message in Spanish or English
+ */
+/**
+ * Generate order confirmation message in Spanish or English
+ * @param {WhatsAppOrderData} orderData - Order data to generate message from
+ * @returns {string} Formatted message for WhatsApp
+ */
+function generateOrderMessage(orderData) {
+    const isSpanish = orderData.language === 'es';
 
-    const symbol = currencySymbols[currency.toUpperCase()] || '$';
-    return `${symbol}${amount.toLocaleString()}`;
-}
+    if (isSpanish) {
+        return `🎉 *¡Confirmación de Orden - ${orderData.store_name}!*
 
-function formatOrderItems(items) {
-    if (!items || !Array.isArray(items)) {
-        return 'Items not available';
+📋 *Orden #${orderData.order_id}*
+👤 Cliente: ${orderData.customer_name}
+📱 Teléfono: ${orderData.customer_phone}
+
+📦 *Artículos Ordenados:*
+${orderData.items.map(item =>
+            `• ${item.name} x${item.quantity} - $${item.price.toFixed(2)}`
+        ).join('\n')}
+
+💰 *Total: $${orderData.total_amount.toFixed(2)} ${orderData.currency}*
+💳 Método de pago: ${orderData.payment_method}
+
+${orderData.delivery_address ? `📍 Dirección: ${orderData.delivery_address}` : ''}
+${orderData.special_instructions ? `📝 Instrucciones: ${orderData.special_instructions}` : ''}
+
+✅ *Su orden ha sido confirmada y será procesada pronto.*
+📞 Nos pondremos en contacto si necesitamos más información.
+
+¡Gracias por elegirnos!
+🌟 ${orderData.store_name}`;
     }
 
-    return items.map(item =>
-        `• ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`
-    ).join('\n');
+    return `🎉 *Order Confirmation - ${orderData.store_name}!*
+
+📋 *Order #${orderData.order_id}*
+👤 Customer: ${orderData.customer_name}
+📱 Phone: ${orderData.customer_phone}
+
+📦 *Items Ordered:*
+${orderData.items.map(item =>
+        `• ${item.name} x${item.quantity} - $${item.price.toFixed(2)}`
+    ).join('\n')}
+
+💰 *Total: $${orderData.total_amount.toFixed(2)} ${orderData.currency}*
+💳 Payment method: ${orderData.payment_method}
+
+${orderData.delivery_address ? `📍 Address: ${orderData.delivery_address}` : ''}
+${orderData.special_instructions ? `📝 Instructions: ${orderData.special_instructions}` : ''}
+
+✅ *Your order has been confirmed and will be processed soon.*
+📞 We'll contact you if we need any additional information.
+
+Thank you for choosing us!
+🌟 ${orderData.store_name}`;
 }
+
+/**
+ * Send WhatsApp message via Meta Business API
+ */
+/**
+ * Send WhatsApp message via Meta Business API
+ * @param {string} to - Target phone number
+ * @param {string} message - Message content
+ * @returns {Promise<WhatsAppResponse>} Response from WhatsApp API
+ */
+async function sendWhatsAppMessage(to, message) {
+    try {
+        console.log(`📱 Sending WhatsApp message to ${to}`);
+
+        // In test mode, just log the message
+        if (CONFIG.TEST_MODE || !CONFIG.WHATSAPP_TOKEN) {
+            console.log('🧪 TEST MODE - WhatsApp Message:');
+            console.log(`To: ${to}`);
+            console.log(`Message: ${message}`);
+
+            return {
+                success: true,
+                messageId: `test_msg_${Date.now()}`,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        // Real WhatsApp API call
+        const url = `${CONFIG.WHATSAPP_API_URL}/${CONFIG.WHATSAPP_PHONE_NUMBER_ID}/messages`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${CONFIG.WHATSAPP_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messaging_product: 'whatsapp',
+                to: to,
+                type: 'text',
+                text: {
+                    body: message
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`WhatsApp API error: ${errorData.error?.message || response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        return {
+            success: true,
+            messageId: data.messages?.[0]?.id,
+            timestamp: new Date().toISOString()
+        };
+
+    } catch (error) {
+        console.error('❌ WhatsApp send error:', error);
+
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown WhatsApp error'
+        };
+    }
+}
+
+// ==================== MAIN HANDLER ====================
+
+/**
+ * Netlify function handler for sending WhatsApp messages
+ * @param {object} event - Netlify event object
+ * @param {object} context - Netlify context
+ * @returns {Promise<{statusCode: number, body: string, headers: object}>} HTTP response
+ */
+export const handler = async (event, context) => {
+
+    // CORS headers
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Content-Type': 'application/json'
+    };
+
+    // Handle CORS preflight
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers,
+            body: ''
+        };
+    }
+
+    // Only allow POST requests
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            headers,
+            body: JSON.stringify({ error: 'Method not allowed' })
+        };
+    }
+
+    try {
+        // Parse request body
+        if (!event.body) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'Request body is required' })
+            };
+        }
+
+        /** @type {WhatsAppOrderData} */
+        const orderData = JSON.parse(event.body);
+
+        // Validate required fields
+        if (!orderData.order_id || !orderData.customer_name || !orderData.customer_phone) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({
+                    error: 'Missing required fields: order_id, customer_name, customer_phone'
+                })
+            };
+        }
+
+        console.log('🚀 Processing WhatsApp notification for order:', orderData.order_id);
+
+        // Format phone number
+        const formattedPhone = formatPhoneNumber(orderData.customer_phone);
+
+        // Generate message
+        const message = generateOrderMessage(orderData);
+
+        // Send WhatsApp message
+        const result = await sendWhatsAppMessage(formattedPhone, message);
+
+        if (result.success) {
+            console.log(`✅ WhatsApp message sent successfully to ${formattedPhone}`);
+
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({
+                    success: true,
+                    messageId: result.messageId,
+                    timestamp: result.timestamp,
+                    phone: formattedPhone
+                })
+            };
+        } else {
+            console.error(`❌ Failed to send WhatsApp message: ${result.error}`);
+
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({
+                    success: false,
+                    error: result.error
+                })
+            };
+        }
+
+    } catch (error) {
+        console.error('💥 Handler error:', error);
+
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({
+                success: false,
+                error: error instanceof Error ? error.message : 'Internal server error'
+            })
+        };
+    }
+};

@@ -21,23 +21,26 @@ export const OrderForm: React.FC<OrderFormProps> = ({
 }) => {
     return (
         <form onSubmit={onPlaceOrder} className="space-y-4">
+            {/* CUSTOMER NAME FIELD - ADD THIS */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {getServiceText('deliveryAddress', isAcademicServices)}
+                    {isAcademicServices ? 'Nombre' : 'Name'} *
                 </label>
                 <input
                     type="text"
-                    name="delivery_address"
-                    value={orderForm.delivery_address}
+                    name="customer_name"
+                    value={orderForm.customer_name}
                     onChange={onInputChange}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder={isAcademicServices ? 'Su nombre completo' : 'Your full name'}
                     required
                 />
             </div>
 
+            {/* PHONE NUMBER FIELD */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
+                    {isAcademicServices ? 'Teléfono' : 'Phone Number'} *
                 </label>
                 <input
                     type="tel"
@@ -45,10 +48,28 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                     value={orderForm.customer_phone}
                     onChange={onInputChange}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder={isAcademicServices ? '+52 33 1234-5678' : '+1 555 123-4567'}
                     required
                 />
             </div>
 
+            {/* DELIVERY ADDRESS FIELD */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {getServiceText('deliveryAddress', isAcademicServices)} *
+                </label>
+                <input
+                    type="text"
+                    name="delivery_address"
+                    value={orderForm.delivery_address}
+                    onChange={onInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder={isAcademicServices ? 'Dirección completa o información de contacto' : 'Full delivery address'}
+                    required
+                />
+            </div>
+
+            {/* SPECIAL INSTRUCTIONS FIELD */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                     {getServiceText('specialInstructions', isAcademicServices)}
@@ -63,12 +84,13 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                 />
             </div>
 
+            {/* SUBMIT BUTTON */}
             <button
                 type="submit"
                 disabled={loading || paymentLoading}
                 className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-                {loading || paymentLoading 
+                {loading || paymentLoading
                     ? getServiceText('loading', isAcademicServices)
                     : getServiceText('placeOrder', isAcademicServices)
                 }

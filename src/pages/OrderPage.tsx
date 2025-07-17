@@ -56,17 +56,16 @@ const OrderPage: React.FC = () => {
         return <LoadingSpinner message={isAcademicServices ? 'Cargando servicios...' : 'Loading menu...'} />;
     }
 
-    // Order complete modal
-    if (orderComplete) {
-        return (
-            <OrderCompleteModal
-                isOpen={orderComplete}
-                onClose={resetOrder}
-                isAcademicServices={isAcademicServices}
-                orderTotal={totalPrice}
-            />
-        );
-    }
+    <OrderCompleteModal
+        isOpen={orderComplete}
+        onClose={resetOrder}
+        isAcademicServices={isAcademicServices}
+        orderTotal={totalPrice}
+        customerPhone={orderForm.customer_phone}
+        customerName={orderForm.customer_name}
+        orderId={`ORDER-${Date.now().toString().slice(-8)}`}
+        enableWhatsApp={whatsappEnabled}
+    />
 
     return (
         <WhatsAppProvider>
