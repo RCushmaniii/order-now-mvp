@@ -1,0 +1,56 @@
+# netlify.toml
+# Netlify configuration file for YapaNow
+
+[build]
+  # Build command
+  command = "npm run build"
+  
+  # Directory to publish
+  publish = "dist"
+  
+  # Functions directory
+  functions = "netlify/functions"
+
+[build.environment]
+  # Ensure Node version compatibility
+  NODE_VERSION = "18"
+  
+  # Install dev dependencies (required for TypeScript)
+  NPM_FLAGS = "--production=false"
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Redirects for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Function configuration
+[functions]
+  node_bundler = "esbuild"
+  
+  # Include files in functions
+  included_files = ["netlify/functions/**"]
