@@ -12,11 +12,20 @@
   functions = "netlify/functions"
 
 [build.environment]
-  # Ensure Node version compatibility
-  NODE_VERSION = "18"
+  # Use Node.js 20 for better crypto module support
+  NODE_VERSION = "20"
   
   # Install dev dependencies (required for TypeScript)
   NPM_FLAGS = "--production=false"
+  
+  # Set build environment variables
+  NODE_ENV = "production"
+  
+  # Increase Node.js memory limit for large builds
+  NODE_OPTIONS = "--max-old-space-size=4096"
+  
+  # Ensure crypto module is available
+  GENERATE_SOURCEMAP = "false"
 
 # Headers for security and performance
 [[headers]]
