@@ -148,7 +148,14 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
         console.log(`📦 Validated order received: ${orderData.order_id}`);
 
         const formattedPhone = formatPhoneNumber(orderData.customer_phone);
-        const message = generateOrderMessage(orderData);
+
+        // Create a new data object that includes the formatted phone for the message template
+        const messageData = {
+            ...orderData,
+            customer_phone: formattedPhone
+        };
+        const message = generateOrderMessage(messageData);
+
         const result = await sendWhatsAppMessage(formattedPhone, message);
 
         return { statusCode: 200, headers, body: JSON.stringify(result) };
