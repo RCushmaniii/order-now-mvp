@@ -198,6 +198,57 @@ class PersistentStorage {
 
 ## WhatsApp Integration API
 
+Authentication & Token Management
+The WhatsApp Business API uses OAuth access tokens for authentication. It is crucial to use the correct type of token for your environment to ensure uninterrupted service.
+
+Temporary Access Tokens (For Testing Only)
+The access token generated from the main "API Setup" page in the Meta for Developers dashboard is a temporary token.
+
+Expiration: It expires automatically after 24 hours.
+
+Use Case: Ideal for initial setup, curl tests, and brief development cycles.
+
+Production Error: When this token expires in a live environment, the API will return an OAuthException (code 190) with the error message:
+Error validating access token: Session has expired...
+
+Conclusion: This token is unsuitable for production use.
+
+Permanent System User Tokens (Required for Production)
+For a stable production application, you must generate a long-lived access token through a System User in your Meta Business Manager.
+
+How to Generate a Permanent Token:
+
+Navigate to your Meta Business Manager and go to Business Settings.
+
+Under Users, select System Users.
+
+Add a new System User with an Admin role if one does not already exist.
+
+Click "Assign assets" and grant this user access to your WhatsApp Business Account.
+
+Select the System User and click "Generate new token".
+
+Choose your application and set the "Token Expiration" to Never.
+
+Select the following required permissions:
+
+whatsapp_business_management
+
+whatsapp_business_messaging
+
+Click "Generate token" and securely copy the generated string.
+
+Implementation in Netlify
+The permanent token must be stored as a secret environment variable in your Netlify project.
+
+Variable Name: WHATSAPP_ACCESS_TOKEN
+
+Location: Netlify Dashboard > Site configuration > Build & deploy > Environment > Environment variables.
+
+Action: Paste your permanent System User token as the value for this variable and trigger a new deployment.
+
+Security Warning: Never commit your access token to your git repository or expose it in your frontend code. It must only be stored as a secure environment variable on Netlify, accessible only by your serverless functions.
+
 ### Service Configuration
 
 ```typescript
