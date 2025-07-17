@@ -45,8 +45,20 @@ export const useOrderProcessor = () => {
                 addDebugStep('PARSE_SESSION', 'success', 'Found order data', orderInfo);
 
                 // Step 2: Get Store Info (assuming a static list for now)
+                // TO (the complete list):
                 const stores: Record<string, StoreInfo> = {
-                    'bella-italia': { name: 'Bella Italia', address: 'Guadalajara, Jalisco, México', phone: '+52 33 8765-4321', type: 'restaurant' }
+                    'dra-veronica-rosas': {
+                        name: 'Dra. Verónica Carolina Rosas Espinoza',
+                        address: 'Zapopan, Jalisco, México',
+                        phone: '+52 33 1234-5678',
+                        type: 'academic'
+                    },
+                    'bella-italia': {
+                        name: 'Bella Italia',
+                        address: 'Guadalajara, Jalisco, México',
+                        phone: '+52 33 8765-4321',
+                        type: 'restaurant'
+                    }
                 };
                 const storeInfo = stores[orderInfo.store_id];
                 if (!storeInfo) throw new Error(`Store with ID "${orderInfo.store_id}" not found.`);
