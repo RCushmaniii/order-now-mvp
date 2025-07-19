@@ -41,9 +41,38 @@ const CONFIG = {
 
 export function formatPhoneNumber(phone: string): string {
     if (!phone) return '';
+    
+    // Remove all non-digit characters
     const cleaned = phone.replace(/\D/g, '');
-    if (cleaned.startsWith('52')) return cleaned;
-    if (cleaned.length === 10) return `52${cleaned}`;
+    
+    // Handle Mexico numbers (country code 52)
+    if (cleaned.startsWith('52')) {
+        // Mexico numbers should be exactly 12 digits: 52 + 10 digits
+        if (cleaned.length === 12) {
+            return cleaned; // Already properly formatted
+        } else if (cleaned.length === 11) {
+            // Missing one digit from country code, likely 52X instead of 52XX
+            // This is the bug! Don't return as-is, log the error
+            console.error(`Invalid Mexico phone number length: ${phone} -> ${cleaned} (${cleaned.length} digits)`);
+            return cleaned; // Return as-is but logged for debugging
+        } else {
+            console.error(`Invalid Mexico phone number format: ${phone} -> ${cleaned} (${cleaned.length} digits)`);
+            return cleaned;
+        }
+    }
+    
+    // Handle domestic Mexico numbers (10 digits)
+    if (cleaned.length === 10) {
+        return `52${cleaned}`;
+    }
+    
+    // Handle US numbers (country code 1)
+    if (cleaned.startsWith('1') && cleaned.length === 11) {
+        return cleaned;
+    }
+    
+    // Log unexpected formats for debugging
+    console.warn(`Unexpected phone number format: ${phone} -> ${cleaned} (${cleaned.length} digits)`);
     return cleaned;
 }
 
