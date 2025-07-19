@@ -190,13 +190,13 @@ function PaymentFormExample() {
 
 export default PaymentFormExample;
 
-/**
+/*
  * ============================================
  * INTEGRATION PATTERNS
  * ============================================
  * 
  * 1. BASIC USAGE:
- * ```tsx
+ * 
  * import StripeErrorBoundary from '../components/StripeErrorBoundary';
  * import { useStripe } from '../hooks/useStripe';
  * 
@@ -208,14 +208,13 @@ export default PaymentFormExample;
  *   
  *   return (
  *     <StripeErrorBoundary>
- *       {/* Your payment form */}
+ *       // Your payment form
  *     </StripeErrorBoundary>
  *   );
  * }
- * ```
  * 
  * 2. WITH CONDITIONAL RENDERING:
- * ```tsx
+ * 
  * function ConditionalPayment({ showPayment }) {
  *   const { stripe, loading, error } = useStripe();
  *   
@@ -233,10 +232,9 @@ export default PaymentFormExample;
  *     </StripeErrorBoundary>
  *   );
  * }
- * ```
  * 
  * 3. WITH LOGGING INTEGRATION:
- * ```tsx
+ * 
  * import { logger } from '../services/logger';
  * 
  * function PaymentWithLogging() {
@@ -255,9 +253,8 @@ export default PaymentFormExample;
  *   
  *   return (
  *     <StripeErrorBoundary>
- *       {/* Payment component */}
+ *       // Payment component
  *     </StripeErrorBoundary>
  *   );
  * }
- * ```
  */
