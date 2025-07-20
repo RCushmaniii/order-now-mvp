@@ -157,17 +157,4 @@ export default function ProtectedRoute() {
   return <Navigate to="/admin/login" replace />
 }
 
-// Hook to access the protected route context
-export function useAdminAuth() {
-  const context = React.useContext(React.createContext<{
-    user: User | null
-    profile: UserProfile | null
-    session: Session | null
-  } | null>(null))
 
-  if (!context) {
-    throw new Error('useAdminAuth must be used within a ProtectedRoute')
-  }
-
-  return context
-}

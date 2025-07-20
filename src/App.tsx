@@ -50,7 +50,7 @@ declare global {
   interface Window {
     gtag?: (command: string, ...args: unknown[]) => void;
   }
-  
+
   interface Performance {
     memory?: {
       usedJSHeapSize: number;
@@ -73,8 +73,13 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Admin components for Supabase backend integration
 const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
-const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const MenuManagement = lazy(() => import('./pages/admin/MenuManagement'));
+const OrderManagement = lazy(() => import('./pages/admin/OrderManagement'));
+const StoreSettings = lazy(() => import('./pages/admin/StoreSettings'));
 const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
 
 // ============================================
 // CONSTANTS AND CONFIGURATION
@@ -221,84 +226,57 @@ LoadingFallback.displayName = 'LoadingFallback';
 const NavigationHeader = memo(() => {
   useRenderPerformance('NavigationHeader');
 
-  /**
-   * Track navigation clicks for analytics
-   */
-  const handleNavClick = (destination: string, label: string) => {
-    logger.info('Navigation link clicked', {
-      destination,
-      label,
-      source: 'header',
-      timestamp: new Date().toISOString()
-    });
-  };
-
   return (
-    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50" role="navigation" aria-label="Main navigation">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo with performance-optimized styling */}
-          <Link
-            to="/"
-            className="flex items-center space-x-2"
-            onClick={() => handleNavClick('/', 'logo')}
-            aria-label="YapaNow Home"
-          >
-            <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: COLORS.primary }}
-            >
-              <span className="text-white font-bold text-xl">Y</span>
-            </div>
-            <span className="text-xl font-bold text-black">YapaNow</span>
-          </Link>
-
-          {/* Desktop Navigation - using CSS for hover states instead of JS */}
-          <div className="hidden md:flex items-center space-x-8">
+    // Update the navigation section in App.tsx HomePage function
+    <nav className="mb-8">
+      <div className="bg-white rounded-lg shadow-sm p-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl font-bold text-gray-800">Order Now MVP</h1>
+          <div className="flex space-x-4">
             <Link
-              to="/stores"
-              className="text-black hover:text-[#17c076] transition-colors font-medium"
-              onClick={() => handleNavClick('/stores', 'store-directory')}
+              to="/"
+              className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
             >
-              Store Directory
+              Home
             </Link>
             <Link
               to="/marketing"
-              className="text-black hover:text-[#17c076] transition-colors font-medium"
-              onClick={() => handleNavClick('/marketing', 'for-businesses')}
+              className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
             >
-              For Businesses
+              Marketing
             </Link>
-            <div className="flex items-center space-x-3">
-              <Link
-                to="/order/bella-italia"
-                className="bg-[#4779ff] hover:bg-[#3a64d8] text-white px-6 py-2 rounded-full font-medium transition-colors"
-                onClick={() => handleNavClick('/order/bella-italia', 'order-food-cta')}
-                aria-label="Order Food from Bella Italia"
-              >
-                Order Food
-              </Link>
-              <Link
-                to="/order/dra-veronica-rosas"
-                className="bg-[#17c076] hover:bg-[#14a366] text-white px-6 py-2 rounded-full font-medium transition-colors"
-                onClick={() => handleNavClick('/order/dra-veronica-rosas', 'book-demo-cta')}
-                aria-label="Book a demo with Dr. Verónica"
-              >
-                Book a Demo
-              </Link>
-            </div>
+            <Link
+              to="/stores"
+              className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            >
+              Store Directory
+            </Link>
+            {/* Add Admin Login Link */}
+            <Link
+              to="/admin/login"
+              className="text-gray-600 hover:text-gray-800 font-medium transition-colors border border-gray-300 hover:border-gray-500 px-3 py-1 rounded"
+            >
+              🔑 Admin Login
+            </Link>
+            <Link
+              to="/order/dra-veronica-rosas"
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Dr. Verónica
+            </Link>
+            <Link
+              to="/order/bella-italia"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Order Food
+            </Link>
+            <Link
+              to="/order-now"
+              className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Order Now Demo
+            </Link>
           </div>
-
-          {/* Mobile menu button with accessibility */}
-          <button
-            className="md:hidden p-2"
-            aria-label="Toggle mobile menu"
-            onClick={() => logger.debug('Mobile menu toggled')}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
         </div>
       </div>
     </nav>
@@ -468,10 +446,19 @@ function App() {
                   <Route path="/order-success" element={<OrderSuccess />} />
                   <Route path="/order/success" element={<OrderSuccess />} />
 
+                  {/* User registration and onboarding */}
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/onboarding" element={<ProtectedRoute />}>
+                    <Route index element={<OnboardingPage />} />
+                  </Route>
+
                   {/* Admin routes with Supabase authentication */}
                   <Route path="/admin/login" element={<AdminLoginPage />} />
                   <Route path="/admin/*" element={<ProtectedRoute />}>
-                    <Route path="dashboard" element={<AdminDashboardPage />} />
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="menu" element={<MenuManagement />} />
+                    <Route path="orders" element={<OrderManagement />} />
+                    <Route path="store" element={<StoreSettings />} />
                   </Route>
 
                   {/* 404 catch-all route - must be last */}

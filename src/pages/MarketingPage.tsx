@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const MarketingPage: React.FC = () => {
     return (
         <div className="marketing-page">
-            {/* Header */}
+          // Update the navigation section in MarketingPage.tsx
             <header className="fixed top-0 w-full bg-black/95 backdrop-blur-sm z-50 border-b border-white/10">
                 <nav className="container mx-auto px-5 flex justify-between items-center py-4">
                     <Link to="/" className="text-2xl font-bold text-white">
@@ -15,13 +15,29 @@ const MarketingPage: React.FC = () => {
                         <a href="#demo" className="text-gray-300 hover:text-white transition-colors">Demo</a>
                         <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
                         <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
+                        {/* Add Admin Login Link */}
+                        <Link
+                            to="/admin/login"
+                            className="text-gray-300 hover:text-white transition-colors border border-gray-500 hover:border-white px-3 py-1 rounded"
+                        >
+                            Admin
+                        </Link>
                     </div>
-                    <Link
-                        to="/stores"
-                        className="bg-gradient-to-r from-gray-100 to-gray-200 text-black px-6 py-2 rounded-lg font-semibold hover:transform hover:-translate-y-1 transition-all duration-300"
-                    >
-                        Try Live Demo
-                    </Link>
+                    <div className="flex space-x-4">
+                        <Link
+                            to="/stores"
+                            className="bg-gradient-to-r from-gray-100 to-gray-200 text-black px-6 py-2 rounded-lg font-semibold hover:transform hover:-translate-y-1 transition-all duration-300"
+                        >
+                            Try Live Demo
+                        </Link>
+                        {/* Alternative: Admin button with icon */}
+                        <Link
+                            to="/admin/login"
+                            className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300 border border-gray-600"
+                        >
+                            🔑 Admin
+                        </Link>
+                    </div>
                 </nav>
             </header>
 

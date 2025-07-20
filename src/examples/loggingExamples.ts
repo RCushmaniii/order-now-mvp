@@ -508,8 +508,11 @@ function maskPhoneNumber(phone: string): string {
 }
 
 // Calculate time between message sent and read
-function calculateTimeToRead(_event: { timestamp: string; sentAt?: string }): number {
+function calculateTimeToRead(event: { timestamp: string; sentAt?: string }): number {
     // Implementation depends on your event structure
+    if (event.sentAt) {
+        return new Date(event.timestamp).getTime() - new Date(event.sentAt).getTime();
+    }
     return 0;
 }
 
@@ -535,12 +538,14 @@ function getCurrentCartValue(): number {
 }
 
 // Placeholder for actual implementations
-async function processOrder(_orderData: { storeId: string; items: unknown[]; total: number }): Promise<{ orderId: string }> {
+async function processOrder(orderData: { storeId: string; items: unknown[]; total: number }): Promise<{ orderId: string }> {
     // Your actual order processing logic
+    console.log('Processing order for store:', orderData.storeId, 'with total:', orderData.total);
     return { orderId: 'ORD-' + Date.now() };
 }
 
-async function sendWhatsAppMessage(_orderData: { orderId: string; customerPhone: string }): Promise<{ messageId: string; status: string }> {
+async function sendWhatsAppMessage(orderData: { orderId: string; customerPhone: string }): Promise<{ messageId: string; status: string }> {
     // Your actual WhatsApp sending logic
+    console.log('Sending WhatsApp message for order:', orderData.orderId, 'to:', orderData.customerPhone);
     return { messageId: 'MSG-' + Date.now(), status: 'sent' };
 }

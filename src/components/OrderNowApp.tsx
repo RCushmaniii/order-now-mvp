@@ -1,6 +1,7 @@
 // This is the complete and final version with ALL original JSX restored and all types corrected.
 import React, { useState } from 'react';
-import { ShoppingCart, Plus, Minus, Store, Clock, CheckCircle, X, Phone, DollarSign, Package, TrendingUp, Search, Star } from 'lucide-react';
+import { Plus, Minus, Clock, CheckCircle, X, Phone, DollarSign, Package, TrendingUp, Search, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { MenuItem, Order, CustomerInfo, CartItem } from '../types';
 import yapLogo from '/images/ui/YAP-sq-og.jpg';
 
@@ -126,8 +127,8 @@ const OrderNowApp: React.FC = () => {
     ));
   };
 
-  const CustomerHeader = () => (
-    <header className="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
+  const DashboardHeader = () => (
+    <header className="bg-white shadow-sm border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -135,22 +136,23 @@ const OrderNowApp: React.FC = () => {
               <img src={yapLogo} alt="YAP Logo" className="w-10 h-10 object-cover rounded-md" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">YAP Now</h1>
-              <p className="text-sm text-gray-500">Fresh food delivered fast</p>
+              <h1 className="text-xl font-bold text-gray-900">YAP Dashboard</h1>
+              <p className="text-sm text-gray-500">Manage orders and menu</p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <button onClick={() => setCurrentView('dashboard')} className="p-2 text-gray-500 hover:text-gray-700 transition-colors">
-              <Store className="w-5 h-5" />
-            </button>
-            <button onClick={() => setShowCheckout(true)} className="relative bg-teal-600 text-white px-6 py-2.5 rounded-full hover:bg-teal-700 transition-colors flex items-center space-x-2 font-medium">
-              <ShoppingCart className="w-4 h-4" />
-              <span>${cartTotal.toFixed(2)}</span>
-              {cart.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
-                </span>
-              )}
+            {/* Add Admin Login Link */}
+            <Link
+              to="/admin/login"
+              className="text-gray-600 hover:text-gray-800 font-medium transition-colors border border-gray-300 hover:border-gray-500 px-3 py-2 rounded-lg"
+            >
+              🔑 Full Admin
+            </Link>
+            <button
+              onClick={() => setCurrentView('customer')}
+              className="bg-teal-600 text-white px-6 py-2.5 rounded-full hover:bg-teal-700 font-medium"
+            >
+              View Storefront
             </button>
           </div>
         </div>
@@ -253,19 +255,7 @@ const OrderNowApp: React.FC = () => {
     </div>
   );
 
-  const DashboardHeader = () => (
-    <header className="bg-white shadow-sm border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center overflow-hidden"><img src={yapLogo} alt="YAP Logo" className="w-10 h-10 object-cover rounded-md" /></div>
-            <div><h1 className="text-xl font-bold text-gray-900">YAP Dashboard</h1><p className="text-sm text-gray-500">Manage orders and menu</p></div>
-          </div>
-          <button onClick={() => setCurrentView('customer')} className="bg-teal-600 text-white px-6 py-2.5 rounded-full hover:bg-teal-700 font-medium">View Storefront</button>
-        </div>
-      </div>
-    </header>
-  );
+
 
   const DashboardStats = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -356,7 +346,7 @@ const OrderNowApp: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       {currentView === 'customer' ? (
         <>
-          <CustomerHeader />
+          <DashboardHeader />
           <SearchAndFilter />
           <main className="max-w-7xl mx-auto px-4 py-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

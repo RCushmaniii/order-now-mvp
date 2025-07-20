@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Store, Book, Utensils, Briefcase, Star, ArrowRight } from 'lucide-react';
 
 interface StoreData {
@@ -65,11 +66,30 @@ const StoreDirectory = () => {
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
             <header className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="text-center">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">YapaNow</h1>
-                        <p className="text-lg text-gray-600">Multi-Channel Ordering Platform</p>
-                        <p className="text-sm text-gray-500 mt-2">Connecting businesses with customers through Facebook, WhatsApp, and direct web ordering</p>
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <Store className="w-8 h-8 text-blue-600" />
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900">YapaNow Directory</h1>
+                                <p className="text-gray-600">Discover and order from local businesses</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            {/* Add Admin Login Link */}
+                            <Link
+                                to="/admin/login"
+                                className="text-gray-600 hover:text-gray-800 font-medium transition-colors border border-gray-300 hover:border-gray-500 px-4 py-2 rounded-lg"
+                            >
+                                🔑 Admin Login
+                            </Link>
+                            <Link
+                                to="/"
+                                className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                            >
+                                ← Back to Home
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </header>
