@@ -561,6 +561,39 @@ console.log('Queue size:', health.queueSize);
 - Allow 24-48 hours for approval
 ```
 
+#### **5. Phone Number Formatting Bug** ⚠️ **CRITICAL**
+```bash
+# Symptoms: Messages show as "sent" but customers don't receive them
+# Root Cause: Digit dropped from Mexico phone numbers during formatting
+
+# Example of the bug:
+Input:  +523315590572 (correct 12-digit Mexico number)
+Output: +52315590572  (incorrect 11-digit number - missing '3')
+
+# This was caused by flawed logic in formatPhoneNumber functions:
+# OLD (BUGGY) CODE:
+if (cleaned.startsWith('52')) return cleaned; // ❌ Too simplistic!
+
+# NEW (FIXED) CODE:
+if (cleaned.startsWith('52')) {
+    if (cleaned.length === 12) {
+        return cleaned; // ✅ Properly formatted Mexico number
+    } else if (cleaned.length === 11) {
+        console.error(`Invalid Mexico phone number length: ${phone}`);
+        return cleaned; // Log the bug for debugging
+    }
+}
+
+# Files that were fixed:
+- src/services/whatsappService.ts
+- netlify/functions/send-whatsapp-message.ts
+
+# Prevention:
+- Always validate Mexico numbers have exactly 12 digits (52 + 10 digits)
+- Use comprehensive logging to catch formatting issues
+- Test with real Mexico phone numbers during development
+```
+
 ### **Debug Tools**
 
 #### **Service Health Check**

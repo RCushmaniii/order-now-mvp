@@ -65,11 +65,16 @@ declare global {
 // ============================================
 // Lazy loaded components for better performance
 const StoreDirectory = lazy(() => import('./pages/StoreDirectory'));
-const OrderPage = lazy(() => import('./pages/OrderPage'));
-const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
-const OrderNowApp = lazy(() => import('./components/OrderNowApp'));
 const MarketingPage = lazy(() => import('./pages/MarketingPage'));
+const OrderPage = lazy(() => import('./pages/OrderPage'));
+const OrderNowApp = lazy(() => import('./components/OrderNowApp'));
+const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+
+// Admin components for Supabase backend integration
+const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
+const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'));
+const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
 
 // ============================================
 // CONSTANTS AND CONFIGURATION
@@ -462,6 +467,12 @@ function App() {
                   <Route path="/order-now" element={<Navigate to="/order-now/bella-italia" replace />} />
                   <Route path="/order-success" element={<OrderSuccess />} />
                   <Route path="/order/success" element={<OrderSuccess />} />
+
+                  {/* Admin routes with Supabase authentication */}
+                  <Route path="/admin/login" element={<AdminLoginPage />} />
+                  <Route path="/admin/*" element={<ProtectedRoute />}>
+                    <Route path="dashboard" element={<AdminDashboardPage />} />
+                  </Route>
 
                   {/* 404 catch-all route - must be last */}
                   <Route path="*" element={<NotFound />} />
